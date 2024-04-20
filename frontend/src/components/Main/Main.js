@@ -86,9 +86,9 @@ export default function Main() {
     }
 
     return (
-        <div>
+        <div className="max-w-[100rem] ml-auto mr-auto">
             <div className = "grid gap-3 grid-cols-4 grid-cols-4 px-3 py-4"> 
-                {allTweets.map(tweet => <Button className={"py-3 px-1 rounded-lg bg-blue-100 overflow-scroll h-20 w-13"} onClick = {selectTweetTile}>{tweet}</Button>)}
+                {allTweets.map(tweet => <Button className={"py-3 px-1 rounded-lg bg-blue-100 overflow-scroll h-20 w-13 max-w-md"} onClick = {selectTweetTile}>{tweet}</Button>)}
             </div>
 
             <div className="inline-block">
