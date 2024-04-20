@@ -42,6 +42,7 @@ export default function Main() {
     const [mistakesRemaining, setMistakesRemaining] = useState(4);
     const [selectedTiles, setSelectedTiles] = useState([]);
     const [categoriesRemaining, setCategoriesRemaining] = useState(4);
+    const [shuffledTweets, setShuffledTweets] = useState(allTweets);
 
     const shuffle = (array) => { 
         return array.map((a) => ({ sort: Math.random(), value: a }))
@@ -49,12 +50,12 @@ export default function Main() {
             .map((a) => a.value); 
     }; 
 
-    const shuffledTweets = shuffle(allTweets);
+    const newShuffledTweets = shuffle(allTweets);
 
-    function shuffleBoard() {
-        return "Hi";
-        // make the tiles come up in a different on a board 
-    }
+    const shuffleBoard = () => {
+        const newShuffledTweets = shuffle(allTweets);
+        setShuffledTweets(newShuffledTweets);
+    };
 
     function deselectAll() {
         return "deselecting all"
@@ -87,8 +88,8 @@ export default function Main() {
 
     return (
         <div>
-            <div className = "grid gap-3 grid-cols-4 grid-cols-4 px-3 py-4"> 
-                {allTweets.map(tweet => <Button className={"py-3 px-1 rounded-lg bg-blue-100 overflow-scroll h-20 w-13"} onClick = {selectTweetTile}>{tweet}</Button>)}
+             <div className = "grid gap-3 grid-cols-4 grid-cols-4 px-3 py-4"> 
+                {newShuffledTweets.map(tweet => <Button className={"py-3 px-1 rounded-lg bg-blue-100 overflow-scroll h-20 w-13"} onClick = {selectTweetTile}>{tweet}</Button>)}
             </div>
 
             <div className="inline-block">
