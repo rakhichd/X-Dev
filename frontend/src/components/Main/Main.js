@@ -2,49 +2,46 @@ import Button from "../Button/Button"
 import React, {useState, useEffect} from "react"
 
 export default function Main() {
-    
+
+
     const tweetsByUser = {
-        "User1": [
-            "Just finished a great workout 💪 #fitness #motivation",
-            "Excited to announce our new product launch next week! Stay tuned for updates. #newproduct #launch",
-            "Had an amazing time hiking with friends this weekend 🏞️ #nature #adventure",
-            "Feeling grateful for all the wonderful people in my life. #gratitude #blessed"
-        ],
-        "User2": [
-            "The quick brown fox jumps over the lazy dog.",
-            "Life is like a box of chocolates.",
-            "Keep calm and carry on.",
-            "Where there is love, there is life."
-        ],
-        "User3": [
-            "Another day, another adventure! #wanderlust #explore",
-            "Just finished a book that left me speechless. Highly recommend! #booklover",
-            "Feeling inspired after attending a coding workshop. #coding #inspiration",
-            "Grateful for the little things that make life beautiful. #gratitude"
-        ],
-        "User4": [
-            "Enjoying the simple moments in life. #simplepleasures",
-            "Excited to start a new project this week! #newbeginnings",
-            "Reflecting on past experiences and looking forward to new adventures. #reflection",
-            "Appreciating the beauty of nature all around us. #naturelover"
-        ]
-    };
+        "elden" : [{id : "1", text: "one edlen"},
+                    {id : "2", text: "two elden"},
+                    {id : "3", text: "three elden"},
+                    {id : "4", text: "four elden"}],
+        "rakhi" : [{id : "5", text: "one rakhi"},
+                    {id : "6", text: "two rakhi"},
+                    {id : "7", text: "three rakhi"},
+                    {id : "8", text: "four rakhi"}],
+        "matthew" : [{id : "9", text: "one matthew"},
+                    {id : "10", text: "two matthew"},
+                    {id : "11", text: "three matthew"},
+                    {id : "12", text: "four matthew"}],
+        "lucas" : [{id : "13", text: "one lucas"},
+                    {id : "14", text: "two lucas"},
+                    {id : "15", text: "three lucas"},
+                    {id : "16", text: "four lucas"}],
+    }
 
     // elonmusk[0].tweet.text 
-    const allTweets = [] // tweets put into an arr to make it easier to randomize 
+    const allTweets = {} // tweets put into an arr to make it easier to randomize 
 
     for (const user in tweetsByUser) {
-        const tweets = tweetsByUser[user];
-        for (const tweet of tweets) {
-            allTweets.push(tweet);
+        const tweetObjects = tweetsByUser[user];
+        for (const tweetObj of tweetObjects) {
+            allTweets[tweetObj.id] = tweetObj.text;
         }
     }
 
-    const [mistakesRemaining, setMistakesRemaining] = useState(4);
-    // const [selectedTiles, setSelectedTiles] = useState([]);
-    const [selectedTiles, setSelectedTiles] = useState(Array(allTweets.length).fill(false));
-    const [categoriesRemaining, setCategoriesRemaining] = useState(4);
-    const [shuffledTweets, setShuffledTweets] = useState(allTweets);
+    const shuffleObject = (obj) => {
+        const keys = Object.keys(obj);
+        const shuffledKeys = shuffle(keys);
+        const shuffledObject = {};
+        shuffledKeys.forEach(key => {
+            shuffledObject[key] = obj[key];
+        });
+        return shuffledObject;
+    };
 
     const shuffle = (array) => { 
         return array.map((a) => ({ sort: Math.random(), value: a }))
@@ -53,11 +50,13 @@ export default function Main() {
     }; 
 
     const shuffleBoard = () => {
-        console.log('hi')
-        setShuffledTweets(shuffle(allTweets));
+        setShuffledTweets(shuffleObject(allTweets));
     };
 
-    console.log(shuffledTweets)
+    const [mistakesRemaining, setMistakesRemaining] = useState(4);
+    const [selectedTiles, setSelectedTiles] = useState(new Set());
+    const [categoriesRemaining, setCategoriesRemaining] = useState(4);
+    const [shuffledTweets, setShuffledTweets] = useState(allTweets);
 
     function deselectAll() {
         return "deselecting all"
@@ -73,11 +72,15 @@ export default function Main() {
     }
 
     const selectTweetTile = (index) => {
-        // change color of tweet to darker blue 
-        // add to arr of selectedTiles
-        const newSelectedTiles = [...selectedTiles];
-        newSelectedTiles[index] = !newSelectedTiles[index];
-        setSelectedTiles(newSelectedTiles);
+        setSelectedTiles(prev => {
+            const updatedSet = new Set(prev); // Create a new set based on the previous set
+            if (!updatedSet.has(index)) {
+                updatedSet.add(index); // Add the index if it's not already in the set
+            } else {
+                updatedSet.delete(index); // Remove the index if it's already in the set
+            }
+            return updatedSet; // Return the updated set
+        });
     };
 
     function MistakesRemaining() { // num of dots to show up based on how many mistakes are remaining 
@@ -92,9 +95,19 @@ export default function Main() {
 
     return (
         <div className="max-w-[100rem] ml-auto mr-auto">
-            <div className = "grid gap-3 grid-cols-4 grid-cols-4 px-3 py-4"> 
-                {shuffledTweets.map(tweet => <Button className={"py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md bg-blue-100"} onClick = {selectTweetTile}>{tweet}</Button>)}
+
+            <div className="grid gap-3 grid-cols-4 grid-cols-4 px-3 py-4">
+                {Object.keys(shuffledTweets).map(tweetID => (
+                    <Button
+                        key={tweetID}
+                        className={`py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md ${selectedTiles.has(tweetID) ? "bg-blue-100" : "bg-gray-100"}`}
+                        onClick={() => selectTweetTile(tweetID)}
+                    >
+                        {shuffledTweets[tweetID]}
+                    </Button>
+                ))}
             </div>
+
 
             <div className="inline-block">
                 <div className="py-3 flex gap-2 "> <h1> Mistakes Remaining: </h1> <MistakesRemaining/> </div>
