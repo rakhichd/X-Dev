@@ -30,6 +30,7 @@ export default function Main() {
         ]
     };
 
+    // elonmusk[0].tweet.text 
     const allTweets = [] // tweets put into an arr to make it easier to randomize 
 
     for (const user in tweetsByUser) {
@@ -40,7 +41,8 @@ export default function Main() {
     }
 
     const [mistakesRemaining, setMistakesRemaining] = useState(4);
-    const [selectedTiles, setSelectedTiles] = useState([]);
+    // const [selectedTiles, setSelectedTiles] = useState([]);
+    const [selectedTiles, setSelectedTiles] = useState(Array(allTweets.length).fill(false));
     const [categoriesRemaining, setCategoriesRemaining] = useState(4);
     const [shuffledTweets, setShuffledTweets] = useState(allTweets);
 
@@ -70,11 +72,13 @@ export default function Main() {
         // if game over call game over function --> happens when categories reminaing = 0 or mistakesremindig = 0
     }
 
-    function selectTweetTile() {
-        return "select Tweet Tile"
+    const selectTweetTile = (index) => {
         // change color of tweet to darker blue 
-        // add to arr of selectedTiles 
-    }
+        // add to arr of selectedTiles
+        const newSelectedTiles = [...selectedTiles];
+        newSelectedTiles[index] = !newSelectedTiles[index];
+        setSelectedTiles(newSelectedTiles);
+    };
 
     function MistakesRemaining() { // num of dots to show up based on how many mistakes are remaining 
         return (
@@ -89,7 +93,7 @@ export default function Main() {
     return (
         <div className="max-w-[100rem] ml-auto mr-auto">
             <div className = "grid gap-3 grid-cols-4 grid-cols-4 px-3 py-4"> 
-                {shuffledTweets.map(tweet => <Button className={"py-3 px-1 rounded-lg bg-blue-100 overflow-scroll h-20 w-13 max-w-md"} onClick = {selectTweetTile}>{tweet}</Button>)}
+                {shuffledTweets.map(tweet => <Button className={"py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md bg-blue-100"} onClick = {selectTweetTile}>{tweet}</Button>)}
             </div>
 
             <div className="inline-block">
