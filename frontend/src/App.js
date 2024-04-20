@@ -1,9 +1,13 @@
 import './App.css';
+import { Sidebar, Main } from './components';
 
 function App() {
   return (
     <div className="App">
-      <h1 className='font-bold'>hi</h1>
+      <div className='flex'>
+        <Sidebar />
+        <Main />
+      </div>
     </div>
   );
 }
