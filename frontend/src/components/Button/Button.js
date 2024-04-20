@@ -1,7 +1,7 @@
-export default function Button({name, className}) {
+export default function Button({children, className}) {
     return (
         <button className = {className}>
-            <h1 className = "font-bold">{name}</h1>
+            <h1 className = "font-bold">{children}</h1>
         </button>
     )
 }
