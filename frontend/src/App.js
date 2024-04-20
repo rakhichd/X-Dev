@@ -4,9 +4,12 @@ import { Sidebar, Main } from './components';
 function App() {
   return (
     <div className="App">
-      <div className='flex'>
+      <div>
         <Sidebar />
+        <div className='ml-[80px]'>
         <Main />
+
+        </div>
       </div>
     </div>
   );

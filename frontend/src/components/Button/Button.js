@@ -1,7 +1,7 @@
-export default function Button({children, className}) {
+export default function Button({ children, className, onClick }) {
     return (
-        <button className = {className}>
-            <h1 className = "font-bold">{children}</h1>
+        <button className={className} onClick={onClick}>
+            <h1 className="font-bold">{children}</h1>
         </button>
     )
 }
