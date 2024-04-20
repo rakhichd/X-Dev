@@ -33,21 +33,24 @@ export default function Main() {
         }
     }
 
-    const shuffleObject = (obj) => {
-        const keys = Object.keys(obj);
-        const shuffledKeys = shuffle(keys);
-        const shuffledObject = {};
-        shuffledKeys.forEach(key => {
-            shuffledObject[key] = obj[key];
-        });
-        return shuffledObject;
+    const shuffleArray = (array) => {
+        const shuffledArray = [...array]; // Create a shallow copy of the array
+        for (let i = shuffledArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1)); // Generate a random index
+            [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]]; // Swap elements
+        }
+        return shuffledArray;
     };
-
-    const shuffle = (array) => { 
-        return array.map((a) => ({ sort: Math.random(), value: a }))
-            .sort((a, b) => a.sort - b.sort)
-            .map((a) => a.value); 
-    }; 
+    
+    const shuffleObject = (obj) => {
+        const values = Object.values(obj);
+        const shuffledValues = shuffleArray(values);
+        const shuffledObj = {};
+        Object.keys(obj).forEach((key, index) => {
+            shuffledObj[key] = shuffledValues[index];
+        });
+        return shuffledObj;
+    };
 
     const shuffleBoard = () => {
         setShuffledTweets(shuffleObject(allTweets));
@@ -59,12 +62,11 @@ export default function Main() {
     const [shuffledTweets, setShuffledTweets] = useState(allTweets);
 
     function deselectAll() {
-        return "deselecting all"
-        // all the selected tiles should reset to og color
-        // reset the selectedTiles to empty array 
+        return setSelectedTiles(new Set());
     }
 
     function submitGuesses() {
+        
         return "submit Guesses"
         // if correct --> makes all the tiles the same color and send it to the top row, categoriesReamining +=1 
         // if wrong, decreases mistakes remaining, call deselectAll, 
@@ -73,13 +75,13 @@ export default function Main() {
 
     const selectTweetTile = (index) => {
         setSelectedTiles(prev => {
-            const updatedSet = new Set(prev); // Create a new set based on the previous set
-            if (!updatedSet.has(index)) {
-                updatedSet.add(index); // Add the index if it's not already in the set
+            const updatedSet = new Set(prev); 
+            if (!updatedSet.has(index) && updatedSet.size < 4) {
+                updatedSet.add(index); 
             } else {
-                updatedSet.delete(index); // Remove the index if it's already in the set
+                updatedSet.delete(index); 
             }
-            return updatedSet; // Return the updated set
+            return updatedSet; 
         });
     };
 
