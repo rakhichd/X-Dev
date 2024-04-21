@@ -13,7 +13,7 @@ export default function Main() {
   const [tweets, setTweets] = useState([]);
   const [correctTiles, setCorrectTiles] = useState([]);
   const [incorrectTiles, setIncorrectTiles] = useState([]);
-  const [done, setDone] = useState(true);
+  const [done, setDone] = useState(false);
   const [oneAway, setOneAway] = useState(false);
   const [start, setStart] = useState(true);
   const [hint, setHint] = useState("");
