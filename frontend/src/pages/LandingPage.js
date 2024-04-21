@@ -12,8 +12,8 @@ import grid from "../media/grid.png"
 export default function LandingPage() {
   const handleClick = async () => {
     const { resultJson } = await signIn();
-    const url = resultJson.link;
-    window.location.href = url;
+    const url = resultJson[0].link;
+    window.location.href = url
   };
 
   return (

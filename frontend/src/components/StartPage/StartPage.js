@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import Button from "../Button/Button"
 import getTweets from "../../api/getTweets";
 
-export default function StartPage({ setIncorrectTiles, shuffle, setStart }) {
+export default function StartPage({ setIncorrectTiles, shuffle, setStart, setFullArr }) {
 
     const [gameStarted, setGameStarted] = useState(false);
 
@@ -10,6 +10,8 @@ export default function StartPage({ setIncorrectTiles, shuffle, setStart }) {
         setGameStarted(true);
         const { resultJson } = await getTweets([], 2020)
         const tweetsArray = [];
+        const fullArr = resultJson;
+
         for (const user in resultJson) {
             if (user == "profile_images") {
                 continue;
@@ -27,7 +29,11 @@ export default function StartPage({ setIncorrectTiles, shuffle, setStart }) {
         setIncorrectTiles(shuffle(tweetsArray))
         setStart(false)
         setGameStarted(false)
+        setFullArr(fullArr);
     };
+
+
+
 
     return (
         <div className="container mx-auto px-4 py-8">

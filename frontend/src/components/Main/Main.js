@@ -16,6 +16,7 @@ export default function Main() {
   const [oneAway, setOneAway] = useState(false);
   const [start, setStart] = useState(true);
   const [hint, setHint] = useState("");
+  const [fullArr, setFullArr] = useState({});
 
   function shuffle(array) {
     const shuffledArray = [...array];
@@ -43,6 +44,17 @@ export default function Main() {
   function deselectAll() {
     return setSelectedTiles([]);
   }
+
+  useEffect(() => {
+    let timer;
+    if (oneAway) {
+        timer = setTimeout(() => {
+            setOneAway(false);
+        }, 5000); // 20 seconds
+    }
+        return () => clearTimeout(timer);
+    }, [oneAway]);
+
 
   const selectTweetTile = (id) => {
     setSelectedTiles((prev) => {
@@ -84,7 +96,6 @@ export default function Main() {
         setDone(true);
     }
   }
-  console.log(done);
 
   function submitGuesses() {
     const arrG = incorrectTiles.filter((tweet) =>
@@ -132,6 +143,8 @@ export default function Main() {
     );
   };
 
+  console.log(correctTiles.concat(incorrectTiles));
+
   return (
     <div className="max-w-[100rem] ml-auto mr-auto flex flex-col items-center">
       {!done ? (
@@ -142,6 +155,7 @@ export default function Main() {
                 setStart={setStart}
                 setIncorrectTiles={setIncorrectTiles}
                 shuffle={shuffle}
+                setFullArr={setFullArr}
               ></StartPage>
             </>
           ) : (
@@ -250,7 +264,7 @@ export default function Main() {
         </>
       ) : (
         <>
-          <DoneScreen></DoneScreen>
+          <DoneScreen tweetsByUser={fullArr} />
         </>
       )}
     </div>
