@@ -17,10 +17,21 @@ import urllib.error
 app = Flask(__name__)
 app.secret_key = 'x_developer_challenge'
 
+# CORS(app)
+# cors = CORS(app, supports_credentials=True, resource={
+#     r"/*":{
+#         "origins":"*"
+#     }
+# })
+
+# CORS(app)
+# CORS(app, supports_credentials=True)
+# CORS(app, origins=['*'])  # Allows all origins
+
 CORS(app)
-cors = CORS(app, supports_credentials=True, resource={
-    r"/*":{
-        "origins":"*"
+cors = CORS(app, supports_credentials=True, resources={
+    r"/*": {
+    "origins": ["http://localhost:3000"]# Specify allowed origins explicitly
     }
 })
 
@@ -43,7 +54,7 @@ request_token_url = 'https://api.twitter.com/oauth/request_token'
 access_token_url = 'https://api.twitter.com/oauth/access_token'
 authorize_url = 'https://api.twitter.com/oauth/authorize'
 show_user_url = 'https://api.twitter.com/1.1/users/show.json'
-app_callback_url = 'https://e2d3-8-25-197-34.ngrok-free.app/callback' # Hardcoded to backend server
+app_callback_url = 'https://6b7f-8-25-197-34.ngrok-free.app/callback' # Hardcoded to backend server
 
 # screen_name = None
 # user_id = None
@@ -93,7 +104,7 @@ def authenticate():
 
     oauth_store[oauth_token] = oauth_token_secret
 
-    return jsonify({"link": f"{authorize_url}?oauth_token={oauth_token}"}, 200)
+    return jsonify({"link": f"{authorize_url}?oauth_token={oauth_token}"}), 200
 
 @app.route('/callback')
 def callback():
@@ -142,7 +153,7 @@ def callback():
     client.access_token = session["real_oauth_token"]
     client.access_token_secret = session["real_oauth_token_secret"]
     
-    return "Hello"
+    return redirect('http://localhost:3000/whosaidthat')
 
 @app.route("/generate_game", methods=["POST"])
 def generate_game():
@@ -162,12 +173,12 @@ def generate_game():
 
     # if not end_time:
     start_datetime = datetime.strptime(start_time, datetime_format)
-    end_datetime = start_datetime + timedelta(weeks=5) ## Hardcoded, change this
+    end_datetime = start_datetime + timedelta(weeks=26) ## Hardcoded, change this
     end_time = end_datetime.strftime(datetime_format)
 
     results["profile_images"] = {}
     for user in users:
-        results[user] = getTopTweets(user, start_time, end_time)
+        results[user] = getTopTweets(user, start_time, end_time, 4)
         
         # Get profile image of user
         user_info = client.get_user(username=user, user_fields=['profile_image_url'])
@@ -176,14 +187,13 @@ def generate_game():
     return jsonify(results), 200
 
 
-def getTopTweets(username, start_time, end_time):
-
+def getTopTweets(username, start_time, end_time, num_tweets):
     def createTweetObjects(tweets):
         lst = []
         for tweet in tweets:
             lst.append(TweetObject(tweet))
         return lst
-    
+        
     query = f'from: {username} -is:retweet -has:links'
 
     time.sleep(0.8)
@@ -200,7 +210,7 @@ def getTopTweets(username, start_time, end_time):
     min_heap = []
 
     for i, tweetObject in enumerate(tweetObjectLst):
-        if i < 4:
+        if i < num_tweets:
             heapq.heappush(min_heap, tweetObject)
         else:
             heapq.heappush(min_heap, tweetObject)
@@ -287,7 +297,7 @@ def interact_tweet():
     interact_type = data.get('interact_type')
     tweet_id = data.get('tweet_id')
     author_id = data.get('author_id')
-    assert interact_type == (0 or 1 or 2) # 0: following, 1: like, 2: retweet
+    assert interact_type in [0, 1, 2] # 0: following, 1: like, 2: retweet
 
     if interact_type == 0:
         client.follow_user(target_user_id=author_id, user_auth=True)
@@ -301,23 +311,19 @@ def interact_tweet():
 # Not used
 @app.route("/generate_higherlower", methods=["POST"])
 def generate_higherlower():
-    usernames = ["elonmusk", "BarackObama", "katyperry", 
-                 "taylorswift13", "kanyewest", "KimKardashian"]
+    usernames = ["elonmusk", "BarackObama", 
+                 "taylorswift13", "kanyewest", "KDTrey5"]
     
+    # Get top 8 tweets within the year for a particular celebrity
     time_now = datetime.now()
-    time_earlier = time_now - timedelta(days=30)
+    time_earlier = time_now - timedelta(weeks=26)
     start_time = time_earlier.strftime(datetime_format)
     end_time = time_now.strftime(datetime_format)
 
     results = {}
 
-    rand_user1 = usernames[random.randint(0, 6)]
-    rand_user2 = usernames[random.randint(0, 6)]
-    while rand_user1 == rand_user2:
-        rand_user2 = usernames[random.randint(0, 6)]
-    
-    results[rand_user1] = getTopTweets(rand_user1, start_time, end_time)
-    results[rand_user2] = getTopTweets(rand_user2, start_time, end_time)
+    rand_user = usernames[random.randint(0, 4)]
+    results[rand_user] = getTopTweets(rand_user, start_time, end_time, 8)
     
     return jsonify(results), 200
     
@@ -326,8 +332,8 @@ class TweetObject:
     def __init__(self, tweet):
         self.text = tweet.text
         self.metrics = tweet.public_metrics
-        self.id = tweet.id
-        self.author_id = tweet.author_id
+        self.id = str(tweet.id)
+        self.author_id = str(tweet.author_id)
         self.popularity = self.metrics["retweet_count"] + self.metrics["reply_count"] + self.metrics["like_count"]
 
     def __lt__(self, other):

@@ -24,3 +24,10 @@ GET http://127.0.0.1:5000/authenticate
 Content-Type: application/json
 
 {}
+
+###
+
+POST http://127.0.0.1:5000/generate_higherlower
+Content-Type: application/json
+
+{}
