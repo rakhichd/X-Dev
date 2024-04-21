@@ -94,9 +94,6 @@ export default function Main() {
     if (arrG.length === 4) {
       if (users.every((user) => user === users[0])) {
         correctGuess();
-        if (incorrectTiles.length === 4) {
-            setDone(true);
-        }
         return true;
       } else {
         users.sort();
