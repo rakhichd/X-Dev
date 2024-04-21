@@ -2,8 +2,8 @@ import { useState } from "react";
 import Card from "./Card";
 
 const HigherLowerContent = ({ posts }) => {
-  const [current, setCurrent] = useState(0);
-  const [offset, setOffset] = useState(0);
+  const [current, setCurrent] = useState(0); // Start at the first card
+  const [offset, setOffset] = useState(0); // Track the horizontal offset
 
   const handleGuess = (direction) => {
     setCurrent((prev) => {
@@ -28,3 +28,21 @@ const HigherLowerContent = ({ posts }) => {
 };
 
 export default HigherLowerContent;
+
+
+// import { useState } from "react";
+// import Card from "./Card";
+
+// const HigherLowerContent = ({ posts }) => {
+//   const [current, setCurrent] = useState(1);
+
+//   return (
+//     <div className="bg-blue-300 w-full h-full flex overflow-hidden">
+//       {posts.map((post, idx) => (
+//         <Card key={idx} text={post.text} likes={post.likes} shown={idx < current} setCurrent={setCurrent} />
+//       ))}
+//     </div>
+//   );
+// };
+
+// export default HigherLowerContent;

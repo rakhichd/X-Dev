@@ -73,6 +73,11 @@ export default function Main() {
     const allStillWrong = incorrectTiles.filter(
       (tweet) => !corr.map((t) => t.id).includes(tweet.id)
     );
+    console.log(allStillWrong)
+    if (allStillWrong.length == 0) {
+        console.log("hi")
+        setDone(true)
+    }
     setIncorrectTiles(allStillWrong);
     setSelectedTiles([]);
     if (allStillWrong.length < 4) {

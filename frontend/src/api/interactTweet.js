@@ -10,6 +10,7 @@ const interactTweet = async (interact_type, tweet_id, author_id) => {
         tweet_id: tweet_id,
         author_id: author_id
     }),
+    credentials: "include"
   });
   const resultJson = await result.json();
   const resultStatus = result.status;
