@@ -1,5 +1,6 @@
 import Button from "../Button/Button"
 import React, { useState, useEffect } from "react"
+import DoneScreen from "../DoneScrren/DoneScreen";
 
 export default function Main() {
 
@@ -8,6 +9,8 @@ export default function Main() {
     const [tweets, setTweets] = useState([]);
     const [correctTiles, setCorrectTiles] = useState([]);
     const [incorrectTiles, setIncorrectTiles] = useState([]);
+    const [done, setDone] = useState(false);
+    const [winOrLose, setWinOrLose] = useState("");
 
     const tweetsByUser = {
         "DevinBook": {
@@ -293,10 +296,12 @@ export default function Main() {
         setCorrectTiles(corr);
         const allStillWrong = incorrectTiles.filter(tweet => !corr.map(t => t.id).includes(tweet.id));
         setIncorrectTiles(allStillWrong);
-        const allTiles = corr.concat(allStillWrong);
-        // setTweets(allTiles);
         console.log(tweets);
         setSelectedTiles([]);
+        if (allStillWrong.length === 0) {
+            setDone(true);
+            setWinOrLose("win");
+        }
     }
 
     function submitGuesses() {
@@ -311,6 +316,10 @@ export default function Main() {
             } else {
                 deselectAll();
                 setMistakesRemaining(mistakesRemaining -1);
+                if (mistakesRemaining === 1) {
+                    setDone(true);
+                    setWinOrLose("lose");
+                }
             }
         } 
         console.log("false");
@@ -321,16 +330,43 @@ export default function Main() {
         <div className="max-w-[100rem] ml-auto mr-auto">
 
 
-            <div className="grid gap-3 grid-cols-4 px-3 py-4">
-                    {correctTiles.map(tweet => (
-                        <Button
-                            key={tweet.id}
-                            className={"py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md bg-pink-500"}
-                            onClick={() => selectTweetTile(tweet.id)}
-                        >
-                            {tweet.text}
-                        </Button>
-                    ))}
+            {!done ? <> <div className="grid gap-3 grid-cols-4 px-3 py-4">
+                {correctTiles.slice(0, 4).map(tweet => (
+                    <Button
+                        key={tweet.id}
+                        className="py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md bg-pink-100"
+                        onClick={() => selectTweetTile(tweet.id)}
+                    >
+                        {tweet.text}
+                    </Button>
+                ))}
+                {correctTiles.slice(4, 8).map(tweet => (
+                    <Button
+                        key={tweet.id}
+                        className="py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md bg-green-100"
+                        onClick={() => selectTweetTile(tweet.id)}
+                    >
+                        {tweet.text}
+                    </Button>
+                ))}
+                {correctTiles.slice(8, 12).map(tweet => (
+                    <Button
+                        key={tweet.id}
+                        className="py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md bg-yellow-100"
+                        onClick={() => selectTweetTile(tweet.id)}
+                    >
+                        {tweet.text}
+                    </Button>
+                ))}
+                {correctTiles.slice(12).map(tweet => (
+                    <Button
+                        key={tweet.id}
+                        className="py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md bg-purple-100"
+                        onClick={() => selectTweetTile(tweet.id)}
+                    >
+                        {tweet.text}
+                    </Button>
+                ))}
                     {incorrectTiles.map(tweet => (
                         <Button
                             key={tweet.id}
@@ -342,28 +378,6 @@ export default function Main() {
                     ))}
                 </div>
 
-            {/* <div className="grid gap-3 grid-cols-4 grid-cols-4 px-3 py-4">
-            {correctTiles.map(tweet => (
-                    <Button
-                        key={tweet.id}
-                        className={`py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md bg-pink-500`}
-                        onClick={() => selectTweetTile(tweet.id)}
-                    >
-                        {tweet.text}
-                    </Button>
-                ))}
-                {incorrectTiles.map(tweet => (
-                    <Button
-                        key={tweet.id}
-                        className={`py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md ${selectedTiles.includes(tweet.id) ? "bg-blue-100" : "bg-gray-100"}`}
-                        onClick={() => selectTweetTile(tweet.id)}
-                    >
-                        {tweet.text}
-                    </Button>
-                ))}
-            </div> */}
-
-
             <div className="inline-block">
                 <div className="py-3 flex gap-2 "> <h1> Mistakes Remaining: </h1> <MistakesRemaining /> </div>
             </div>
@@ -373,7 +387,8 @@ export default function Main() {
                 <Button className={"active:bg-blue-300 border border-opacity-100 px-6 py-2 rounded-full border-black"} onClick={deselectAll}>Deselect All</Button>
                 <Button className={"active:bg-blue-500 border border-opacity-100 px-6 py-2 rounded-full border-black"} onClick = {submitGuesses}>Submit</Button>
                 <Button className={"active:bg-blue-500 border border-opacity-100 px-6 py-2 rounded-full border-black"}>?</Button>
-            </div>
+            </div> </>: <DoneScreen> {winOrLose} </DoneScreen>
+                }
         </div>
     )
 }
