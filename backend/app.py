@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect, session
 from flask_cors import CORS
 import tweepy
 import heapq
@@ -15,6 +15,7 @@ import urllib.parse
 import urllib.error
 
 app = Flask(__name__)
+app.secret_key = 'x_developer_challenge'
 
 CORS(app)
 cors = CORS(app, supports_credentials=True, resource={
@@ -24,6 +25,15 @@ cors = CORS(app, supports_credentials=True, resource={
 })
 
 os.environ['XAI_API_KEY'] = 'Eh97MbeIZ4p4UjhF4D8JVyTRAZm7oErMkdePDVi1jWzNYWPq47XPUFWgqcBd0Ysa7bfaAwrHZCVxK+pzGSVBaXUvHmKzZ8F34vsqwtDpI3hKBCf3rhIz/Obwir0obKZ9PQ'
+os.environ['TWAUTH_APP_CONSUMER_KEY'] = 'wDcdhO9o75G5ZFsnMnFK16LTS'
+os.environ['TWAUTH_APP_CONSUMER_SECRET'] = 'rsQf7GMYLORyXDaoYbHDigLvlMhdJRPDRE1A2MMsT1CjiD6Veb'
+
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['APP_CONSUMER_KEY'] = os.getenv('TWAUTH_APP_CONSUMER_KEY', 'API_Key_from_Twitter')
+app.config['APP_CONSUMER_SECRET'] = os.getenv('TWAUTH_APP_CONSUMER_SECRET', 'API_Secret_from_Twitter')
+
+oauth_store = {}
 
 client = tweepy.Client(bearer_token="AAAAAAAAAAAAAAAAAAAAAIShtQEAAAAAX5yH8Y5AT6WB5RtgNuNuqBJwY30%3DOqrBQEx2w81UOBuINmPO5bBb73jW1V44yMwkJ5JoqmzGR3fCwU",
                         consumer_key="wDcdhO9o75G5ZFsnMnFK16LTS",
@@ -33,20 +43,106 @@ request_token_url = 'https://api.twitter.com/oauth/request_token'
 access_token_url = 'https://api.twitter.com/oauth/access_token'
 authorize_url = 'https://api.twitter.com/oauth/authorize'
 show_user_url = 'https://api.twitter.com/1.1/users/show.json'
+app_callback_url = 'https://e2d3-8-25-197-34.ngrok-free.app/callback' # Hardcoded to backend server
+
+# screen_name = None
+# user_id = None
+
+datetime_format = "%Y-%m-%dT%H:%M:%SZ"
 
 # Routes
 @app.route('/')
-def nothing():
-    return "empty route"
+def hello():
+
+    consumer = oauth.Consumer(app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
+    api = oauth.Client(consumer)
+    
+    resp, content = api.request(request_token_url, "POST", body=urllib.parse.urlencode({
+                                   "oauth_callback": app_callback_url}))
+    
+    if resp['status'] != '200':
+        error_message = 'Invalid response, status {status}, {message}'.format(
+            status=resp['status'], message=content.decode('utf-8'))
+        return jsonify({'error_message': error_message}, resp['status'])
+
+    request_token = dict(urllib.parse.parse_qsl(content))
+    oauth_token = request_token[b'oauth_token'].decode('utf-8')
+    oauth_token_secret = request_token[b'oauth_token_secret'].decode('utf-8')
+
+    oauth_store[oauth_token] = oauth_token_secret
+
+    return redirect(f"{authorize_url}?oauth_token={oauth_token}")
+
+@app.route('/authenticate')
+def authenticate():
+
+    consumer = oauth.Consumer(app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
+    api = oauth.Client(consumer)
+    
+    resp, content = api.request(request_token_url, "POST", body=urllib.parse.urlencode({
+                                   "oauth_callback": app_callback_url}))
+    
+    if resp['status'] != '200':
+        error_message = 'Invalid response, status {status}, {message}'.format(
+            status=resp['status'], message=content.decode('utf-8'))
+        return jsonify({'error_message': error_message}, resp['status'])
+
+    request_token = dict(urllib.parse.parse_qsl(content))
+    oauth_token = request_token[b'oauth_token'].decode('utf-8')
+    oauth_token_secret = request_token[b'oauth_token_secret'].decode('utf-8')
+
+    oauth_store[oauth_token] = oauth_token_secret
+
+    return jsonify({"link": f"{authorize_url}?oauth_token={oauth_token}"}, 200)
 
 @app.route('/callback')
 def callback():
     # Accept the callback params, get the token and call the API to
     # display the logged-in user's name and handle
+
     oauth_token = request.args.get('oauth_token')
     oauth_verifier = request.args.get('oauth_verifier')
     oauth_denied = request.args.get('denied')
 
+    # if the OAuth request was denied, delete our local token
+    # and show an error message
+    if oauth_denied:
+        if oauth_denied in oauth_store:
+            del oauth_store[oauth_denied]
+        return jsonify({'error_message': "the OAuth request was denied by this user"}, 400)
+    
+    if not oauth_token or not oauth_verifier:
+        return jsonify({'error_message': "callback param(s) missing"}, 400)
+
+    # unless oauth_token is still stored locally, return error
+    if oauth_token not in oauth_store:
+        return jsonify({'error_message': "oauth_token not found locally"}, 400)
+    
+    oauth_token_secret = oauth_store[oauth_token]
+    oauth_token_secret = oauth_store[oauth_token]
+
+    consumer = oauth.Consumer(app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
+    token = oauth.Token(oauth_token, oauth_token_secret)
+    token.set_verifier(oauth_verifier)
+    api = oauth.Client(consumer, token)
+
+    resp, content = api.request(access_token_url, "POST")
+    access_token = dict(urllib.parse.parse_qsl(content))
+
+    session["screen_name"] = access_token[b'screen_name'].decode('utf-8')
+    session["user_id"] = access_token[b'user_id'].decode('utf-8')
+
+    # These are the tokens you would store long term, someplace safe
+    session["real_oauth_token"] = access_token[b'oauth_token'].decode('utf-8')
+    session["real_oauth_token_secret"] = access_token[b'oauth_token_secret'].decode('utf-8')
+    
+    # don't keep this token and secret in memory any longer
+    del oauth_store[oauth_token]
+
+    client.access_token = session["real_oauth_token"]
+    client.access_token_secret = session["real_oauth_token_secret"]
+    
+    return "Hello"
 
 @app.route("/generate_game", methods=["POST"])
 def generate_game():
@@ -54,7 +150,7 @@ def generate_game():
     data = request.json
     custom_users = data.get('custom_users')
     start_time = data.get('start_time')
-    end_time = data.get('end_time')
+    end_time = data.get('end_time') # end_time can be optionally none
     
     # Default users
     users = ["elonmusk", "VancityReynolds", "KDTrey5", "NICKIMINAJ"]
@@ -64,14 +160,18 @@ def generate_game():
 
     results = {}
 
-    # # Replace with time period of your choice
-    # start_time = '2023-01-01T00:00:00Z'
+    # if not end_time:
+    start_datetime = datetime.strptime(start_time, datetime_format)
+    end_datetime = start_datetime + timedelta(weeks=5) ## Hardcoded, change this
+    end_time = end_datetime.strftime(datetime_format)
 
-    # # Replace with time period of your choice
-    # end_time = '2023-08-01T00:00:00Z'
-
+    results["profile_images"] = {}
     for user in users:
         results[user] = getTopTweets(user, start_time, end_time)
+        
+        # Get profile image of user
+        user_info = client.get_user(username=user, user_fields=['profile_image_url'])
+        results["profile_images"][user] = user_info.data['profile_image_url']
     
     return jsonify(results), 200
 
@@ -87,7 +187,7 @@ def getTopTweets(username, start_time, end_time):
     query = f'from: {username} -is:retweet -has:links'
 
     time.sleep(0.8)
-    tweets = client.search_all_tweets(query=query, tweet_fields=['context_annotations', 'created_at', 'public_metrics'],
+    tweets = client.search_all_tweets(query=query, tweet_fields=['context_annotations', 'created_at', 'public_metrics', 'author_id'],
                                   start_time=start_time,
                                   end_time=end_time, max_results=100)
 
@@ -113,7 +213,7 @@ def getTopTweets(username, start_time, end_time):
     while next_token:
         try: 
             time.sleep(0.8)
-            tweets = client.search_all_tweets(query=query, tweet_fields=['context_annotations', 'created_at', 'public_metrics'],
+            tweets = client.search_all_tweets(query=query, tweet_fields=['context_annotations', 'created_at', 'public_metrics', 'author_id'],
                                         start_time=start_time,
                                         end_time=end_time, next_token=next_token, max_results=100)
             tweetObjectLst = createTweetObjects(tweets.data)
@@ -140,6 +240,7 @@ def getTopTweets(username, start_time, end_time):
         tweet_dict["id"] = obj.id
         tweet_dict["metrics"] = obj.metrics
         tweet_dict["text"] = obj.text
+        tweet_dict["author_id"] = obj.author_id
         dict[i] = tweet_dict
         i += 1
     return dict
@@ -179,6 +280,25 @@ async def hint():
 
     return jsonify({"hint": output}), 200
 
+@app.route("/interact_tweet", methods=["POST"])
+def interact_tweet():
+
+    data = request.json
+    interact_type = data.get('interact_type')
+    tweet_id = data.get('tweet_id')
+    author_id = data.get('author_id')
+    assert interact_type == (0 or 1 or 2) # 0: following, 1: like, 2: retweet
+
+    if interact_type == 0:
+        client.follow_user(target_user_id=author_id, user_auth=True)
+    elif interact_type == 1:
+        client.like(tweet_id=tweet_id, user_auth=True)
+    else:
+        client.retweet(tweet_id=tweet_id, user_auth=True)
+    
+    return jsonify({"message": "Successfully interacted with tweet"}, 200)
+
+# Not used
 @app.route("/generate_higherlower", methods=["POST"])
 def generate_higherlower():
     usernames = ["elonmusk", "BarackObama", "katyperry", 
@@ -186,8 +306,8 @@ def generate_higherlower():
     
     time_now = datetime.now()
     time_earlier = time_now - timedelta(days=30)
-    start_time = time_earlier.strftime("%Y-%m-%dT%H:%M:%SZ")
-    end_time = time_now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    start_time = time_earlier.strftime(datetime_format)
+    end_time = time_now.strftime(datetime_format)
 
     results = {}
 
@@ -198,8 +318,6 @@ def generate_higherlower():
     
     results[rand_user1] = getTopTweets(rand_user1, start_time, end_time)
     results[rand_user2] = getTopTweets(rand_user2, start_time, end_time)
-
-    print(results)
     
     return jsonify(results), 200
     
@@ -209,11 +327,11 @@ class TweetObject:
         self.text = tweet.text
         self.metrics = tweet.public_metrics
         self.id = tweet.id
+        self.author_id = tweet.author_id
         self.popularity = self.metrics["retweet_count"] + self.metrics["reply_count"] + self.metrics["like_count"]
-    
+
     def __lt__(self, other):
         return self.popularity < other.popularity
 
 if __name__ == "__main__":
-    # app.run(debug=True)
-    generate_game(None)
+    app.run(debug=True)
