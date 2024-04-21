@@ -112,23 +112,6 @@ export default function Main() {
   }
 }
 
-  const CustomizeButton = ({ width }) => {
-    return (
-      <button
-        className={`mt-5 flex flex-row items-center bg-black bg-opacity-10 p-2 rounded-[4px] mb-[6px] border border-white border-opacity-10 hover:bg-opacity-[.15] `}
-        onClick={() => {
-          setGlobalState("showAddPeople", true);
-          setGlobalState("showSideBar", false);
-        }}
-      >
-        <FaUserFriends className="text-lg w-[24px] text-[#7289da] mr-2" />
-        <span className="whitespace-nowrap overflow-hidden">
-          <span className="text-black font-semibold">Customize</span>
-        </span>
-      </button>
-    );
-  };
-
   return (
     <div className="max-w-[100rem] ml-auto mr-auto flex flex-col items-center">
       {!done ? (
@@ -211,7 +194,7 @@ export default function Main() {
               <div className="flex gap-2 place-content-center">
                 <Button
                   className={
-                    "active:bg-blue-300 border border-opacity-100 px-6 py-2 rounded-full border-black"
+                    "hover:bg-gray-200 duration-200 border border-opacity-100 px-6 py-2 rounded-full border-black"
                   }
                   onClick={shuffleBoard}
                 >
@@ -219,7 +202,7 @@ export default function Main() {
                 </Button>
                 <Button
                   className={
-                    "active:bg-blue-300 border border-opacity-100 px-6 py-2 rounded-full border-black"
+                    "hover:bg-gray-200 duration-200 border border-opacity-100 px-6 py-2 rounded-full border-black"
                   }
                   onClick={deselectAll}
                 >
@@ -227,7 +210,7 @@ export default function Main() {
                 </Button>
                 <Button
                   className={
-                    "active:bg-blue-500 border border-opacity-100 px-6 py-2 rounded-full border-black"
+                    "hover:bg-gray-200 duration-200 border border-opacity-100 px-6 py-2 rounded-full border-black"
                   }
                   onClick={submitGuesses}
                 >
@@ -235,7 +218,7 @@ export default function Main() {
                 </Button>
                 <Button
                   className={
-                    "active:bg-blue-500 border border-opacity-100 px-6 py-2 rounded-full border-black"
+                    "hover:bg-gray-200 duration-200 border border-opacity-100 px-6 py-2 rounded-full border-black"
                   }
                   onClick={handleHint}
                 >

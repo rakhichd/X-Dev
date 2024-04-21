@@ -1,26 +1,70 @@
 import { useState } from "react";
 import Card from "./Card";
+import useDimensions from "../../hooks/useDimensions";
 
-const HigherLowerContent = ({ posts }) => {
-  const [current, setCurrent] = useState(0); // Start at the first card
-  const [offset, setOffset] = useState(0); // Track the horizontal offset
+const HigherLowerContent = ({ posts, setDone, setScore, score }) => {
+  const [current, setCurrent] = useState(1);
+  const [offset, setOffset] = useState(0);
+  const { width } = useDimensions();
 
-  const handleGuess = (direction) => {
-    setCurrent((prev) => {
-      const newIndex = direction === 'higher' ? prev + 1 : prev - 1;
-      if (newIndex >= 0 && newIndex < posts.length) {
-        setOffset(newIndex * -50);
-        return newIndex;
+  const handleLower = () => {
+    if (posts[current].likes < posts[current - 1].likes) {
+      const s = score + 1
+      setScore((prev) => prev + 1);
+      console.log(s)
+      if (s == posts.length - 1) {
+        setCurrent((prev) => prev + 1);
+        setTimeout(function() {
+          setDone(true)
+        }, 1000);
+      } else {
+        setOffset((prev) => prev + (width - 80) / 2);
+        setCurrent((prev) => prev + 1);
       }
-      return prev;
-    });
+    } else {
+      setCurrent((prev) => prev + 1)
+      setTimeout(function() {
+        setDone(true)
+      }, 1000);
+    }
+  };
+
+  const handleHigher = () => {
+    if (posts[current].likes > posts[current - 1].likes) {
+      const s = score + 1
+      setScore((prev) => prev + 1);
+      if (s == posts.length - 1) {
+        setCurrent((prev) => prev + 1);
+        setTimeout(function() {
+          setDone(true)
+        }, 1000);
+      } else {
+        setOffset((prev) => prev + (width - 80) / 2);
+        setCurrent((prev) => prev + 1);
+      }
+    } else {
+      setCurrent((prev) => prev + 1)
+      setTimeout(function() {
+        setDone(true)
+      }, 1000);
+    }
   };
 
   return (
-    <div className="bg-blue-300 w-full h-full flex overflow-hidden relative">
-      <div className="flex transition-transform duration-500" style={{ transform: `translateX(${offset}%)` }}>
+    <div className="h-full overflow-hidden" style={{ width: width - 80 }}>
+      <div
+        className={`flex h-full transition-transform duration-500`}
+        style={{ transform: `translateX(-${offset}px)` }}
+      >
         {posts.map((post, idx) => (
-          <Card key={idx} text={post.text} likes={post.likes} shown={idx === current} setCurrent={handleGuess} />
+          <Card
+            key={idx}
+            text={post.text}
+            likes={post.likes}
+            shown={idx < current}
+            handleHigher={handleHigher}
+            handleLower={handleLower}
+          />
         ))}
       </div>
     </div>
@@ -28,21 +72,3 @@ const HigherLowerContent = ({ posts }) => {
 };
 
 export default HigherLowerContent;
-
-
-// import { useState } from "react";
-// import Card from "./Card";
-
-// const HigherLowerContent = ({ posts }) => {
-//   const [current, setCurrent] = useState(1);
-
-//   return (
-//     <div className="bg-blue-300 w-full h-full flex overflow-hidden">
-//       {posts.map((post, idx) => (
-//         <Card key={idx} text={post.text} likes={post.likes} shown={idx < current} setCurrent={setCurrent} />
-//       ))}
-//     </div>
-//   );
-// };
-
-// export default HigherLowerContent;

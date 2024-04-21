@@ -4,6 +4,7 @@ const getHighLow = async () => {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include"
   });
   const resultJson = await result.json();
   return { resultJson };
