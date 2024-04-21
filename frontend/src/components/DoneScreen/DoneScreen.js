@@ -5,7 +5,7 @@ import { IoMdHeartEmpty } from "react-icons/io";
 
 
 
-export default function DoneScreen({status}) {
+export default function DoneScreen() {
 
     const tweetsByUser = {
           "DevinBook": {
