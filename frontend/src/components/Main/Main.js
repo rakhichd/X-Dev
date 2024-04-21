@@ -214,24 +214,27 @@ export default function Main() {
   };
 
   useEffect(() => {
-    const wait = async () => {
-      const { resultJson } = await getTweets([], "2000", "2024");
-      return resultJson
-    };
-    const tweetsByUser = wait()
-    const tweetsArray = []
-    for (const user in tweetsByUser) {
-      const userTweets = tweetsByUser[user];
-      for (const tweetId in userTweets) {
-        const tweet = userTweets[tweetId];
-        tweetsArray.push({
-          user: user,
-          id: tweet.id,
-          text: tweet.text,
-        });
+    const fetchTweets = async () => {
+      const { resultJson } = await getTweets([], "2020", "2021"); // Assuming getTweets is imported
+      
+      const tweetsArray = [];
+      for (const user in resultJson) {
+        const userTweets = resultJson[user];
+        for (const tweetIndex in userTweets) {
+          const tweet = userTweets[tweetIndex];
+          tweetsArray.push({
+            user: user,
+            id: tweet.id,
+            text: tweet.text,
+          });
+        }
       }
-    }
-    setIncorrectTiles(shuffle(tweetsArray));
+    
+      console.log(tweetsArray);
+      setIncorrectTiles(shuffle(tweetsArray));
+    };
+
+    fetchTweets();
   }, []);
 
   function shuffle(array) {

@@ -1,13 +1,16 @@
 const getTweets = async (people, start, end) => {
+    console.log(people, start, end)
   const formatDate = (year) => {
     if (year === "2024") {
-      return new Date().toISOString();
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - 10);
+        return now.toISOString();
     } else {
       return `${year}-01-01T00:00:00Z`;
     }
   };
 
-  const result = await fetch("http://127.0.0.1:5000/generate_game", {
+  const result = await fetch("https://e2d3-8-25-197-34.ngrok-free.app/generate_game", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

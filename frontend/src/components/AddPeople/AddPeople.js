@@ -7,8 +7,7 @@ import { setGlobalState, useGlobalState } from "../../state/state";
 export default function AddPeople() {
   const [people] = useGlobalState("people");
   const [form, setForm] = useState("");
-  const [start, setStart] = useState("2000");
-  const [end, setEnd] = useState("2024");
+  const [start, setStart] = useState("2023");
 
   const handleChange = (event) => {
     setForm(event.target.value);
@@ -16,10 +15,6 @@ export default function AddPeople() {
 
   const handleStart = (event) => {
     setStart(event.target.value);
-  };
-
-  const handleEnd = (event) => {
-    setEnd(event.target.value);
   };
 
   const handleDone = () => {
@@ -31,6 +26,7 @@ export default function AddPeople() {
     }
     const combined = p.concat(people);
     setGlobalState("people", combined);
+    setGlobalState("startDate", start)
     setForm("");
     setGlobalState("showAddPeople", false);
   };
@@ -98,23 +94,18 @@ export default function AddPeople() {
           </h1>
         </div>
         <div className="flex items-center gap-3 mt-5">
-          <h1 className="text-xl">Time Period:</h1>
+          <div>
+            <h1 className="text-xl">Year:</h1>
+          </div>
           <div className="flex gap-2">
-
-          <TextInput
-            value={start}
-            onChange={handleStart}
-            placeholder="Start Date"
-            className="w-28 text-center"
+            <TextInput
+              value={start}
+              onChange={handleStart}
+              placeholder="Enter year..."
+              className="w-32 text-center"
             />
-          <TextInput
-            value={end}
-            onChange={handleEnd}
-            placeholder="End Date"
-            className="w-28 text-center"
-            />
+          </div>
         </div>
-            </div>
         <Button
           className="bg-black hover:opacity-80 duration-200 px-5 py-2 mt-3 rounded-md text-white"
           onClick={handleDone}
