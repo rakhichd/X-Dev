@@ -8,11 +8,28 @@ module.exports = {
                 '0%, 100%': {
                     transform: 'translate(-50%, -50%) translateY(0)',
                 },
-                '10%, 30%, 50%, 70%, 90%': {
+                '25%': {
                     transform: 'translate(-50%, -50%) translateY(-50vh)',
                 },
-                '20%, 40%, 60%, 80%': {
+                '50%': {
                     transform: 'translate(-50%, -50%) translateX(50vw)',
+                },
+                '75%': {
+                    transform: 'translate(-50%, -50%) translateY(50vh)',
+                },
+            },
+            'bounce-reverse': {
+                '0%, 100%': {
+                    transform: 'translate(-50%, -50%) translateY(0)',
+                },
+                '25%': {
+                    transform: 'translate(-50%, -50%) translateY(50vh)',
+                },
+                '50%': {
+                    transform: 'translate(-50%, -50%) translateX(-50vw)',
+                },
+                '75%': {
+                    transform: 'translate(-50%, -50%) translateY(-50vh)',
                 },
             },
         },

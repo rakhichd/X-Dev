@@ -11,6 +11,7 @@ export default function Main() {
     const [incorrectTiles, setIncorrectTiles] = useState([]);
     const [done, setDone] = useState(false);
     const [winOrLose, setWinOrLose] = useState("");
+    const [oneAway, setOneAway] = useState(false);
 
     const tweetsByUser = {
         "DevinBook": {
@@ -247,6 +248,17 @@ export default function Main() {
         setIncorrectTiles(shuffle(tweetsArray));
     }, [])
 
+    useEffect(() => {
+        let timer;
+        if (oneAway) {
+            timer = setTimeout(() => {
+                setOneAway(false);
+            }, 5000); // 20 seconds
+        }
+
+        return () => clearTimeout(timer);
+    }, [oneAway]);
+
     function shuffle(array) {
         const shuffledArray = [...array];
         for (let i = shuffledArray.length - 1; i > 0; i--) {
@@ -307,14 +319,26 @@ export default function Main() {
     function submitGuesses() {
         const arrG = incorrectTiles.filter(tweet => selectedTiles.includes(tweet.id)); // based on selected tiles, get the user,id,text
         console.log(arrG);
+        const users = arrG.map(tweet => tweet.user);
         if (arrG.length === 4) {
-            const users = arrG.map(tweet => tweet.user);
             if (users.every(user => user === users[0])) {
                 correctGuess();
                 console.log("true");
                 return true; // All selected tweets have the same user
             } else {
                 //deselectAll();
+                // check if three users are all the same 
+                users.sort();
+                let countArr = 0;
+                for (let i = 0; i < users.length-1; i++) {
+                    if (users[i] === users[i+1]) {
+                        countArr = countArr + 1;
+                    }
+                }
+                if (countArr === 2) {
+                    setOneAway(true);
+                }
+                console.log(countArr);
                 setMistakesRemaining(mistakesRemaining -1);
                 if (mistakesRemaining === 1) {
                     setDone(true);
@@ -329,8 +353,9 @@ export default function Main() {
     return (
         <div className="max-w-[100rem] ml-auto mr-auto">
 
-
-            {!done ? <> <div className="grid gap-3 grid-cols-4 px-3 py-4 mt-10">
+            {!done ? <> 
+            {oneAway && <div className = "fade-out mt-6">One Away...</div>}
+            <div className="grid gap-3 grid-cols-4 px-3 py-4 mt-7">
                 {correctTiles.slice(0, 4).map(tweet => (
                     <Button
                         key={tweet.id}
