@@ -3,7 +3,8 @@ import { createGlobalState } from "react-hooks-global-state";
 const { setGlobalState, useGlobalState, getGlobalState } = createGlobalState({
   showSideBar: false,
   showAddPeople: false,
-  people: []
+  people: [],
+  tweets: {}
 });
 
 export { getGlobalState, setGlobalState, useGlobalState };
