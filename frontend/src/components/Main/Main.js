@@ -6,6 +6,8 @@ export default function Main() {
     const [mistakesRemaining, setMistakesRemaining] = useState(4);
     const [selectedTiles, setSelectedTiles] = useState([]);
     const [tweets, setTweets] = useState([]);
+    const [correctTiles, setCorrectTiles] = useState([]);
+    const [incorrectTiles, setIncorrectTiles] = useState([]);
 
     const tweetsByUser = {
         "DevinBook": {
@@ -210,10 +212,6 @@ export default function Main() {
         }
     }
 
-    //var allTweets = {} // tweets put into an arr to make it easier to randomize 
-    // var userToId = convertTweetsToUserIds(tweetsByUser);
-
-
     const tweetsArray = [];
 
     for (const user in tweetsByUser) {
@@ -230,13 +228,6 @@ export default function Main() {
 
     console.log(tweetsArray);
 
-    // for (const user in tweetsByUser) {
-    //     const tweetObjects = tweetsByUser[user];
-    //     for (const tweetObj of tweetObjects) {
-    //         allTweets[tweetObj.id] = tweetObj.text;
-    //     }
-    // }
-
     useEffect(() => {
         const tweetsArray = [];
         for (const user in tweetsByUser) {
@@ -250,7 +241,7 @@ export default function Main() {
                 });
             }
         }
-        setTweets(shuffle(tweetsArray));
+        setIncorrectTiles(shuffle(tweetsArray));
     }, [])
 
     function shuffle(array) {
@@ -264,7 +255,7 @@ export default function Main() {
     
 
     const shuffleBoard = () => {
-        setTweets(prev => shuffle(prev));
+        setIncorrectTiles(prev => shuffle(prev));
     };
 
     function deselectAll() {
@@ -296,12 +287,20 @@ export default function Main() {
     }
 
     function correctGuess() {
-        const allButSelected = tweets.filter(tweet => !selectedTiles.includes(tweet.id));
-        
+        const allGtiles = incorrectTiles.filter(tweet => selectedTiles.includes(tweet.id));
+        const corr = correctTiles.concat(allGtiles);
+        console.log(corr);
+        setCorrectTiles(corr);
+        const allStillWrong = incorrectTiles.filter(tweet => !corr.map(t => t.id).includes(tweet.id));
+        setIncorrectTiles(allStillWrong);
+        const allTiles = corr.concat(allStillWrong);
+        // setTweets(allTiles);
+        console.log(tweets);
+        setSelectedTiles([]);
     }
 
     function submitGuesses() {
-        const arrG = tweets.filter(tweet => selectedTiles.includes(tweet.id)); // based on selected tiles, get the user,id,text
+        const arrG = incorrectTiles.filter(tweet => selectedTiles.includes(tweet.id)); // based on selected tiles, get the user,id,text
         console.log(arrG);
         if (arrG.length === 4) {
             const users = arrG.map(tweet => tweet.user);
@@ -321,8 +320,39 @@ export default function Main() {
     return (
         <div className="max-w-[100rem] ml-auto mr-auto">
 
-            <div className="grid gap-3 grid-cols-4 grid-cols-4 px-3 py-4">
-                {tweets.map(tweet => (
+
+            <div className="grid gap-3 grid-cols-4 px-3 py-4">
+                    {correctTiles.map(tweet => (
+                        <Button
+                            key={tweet.id}
+                            className={"py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md bg-pink-500"}
+                            onClick={() => selectTweetTile(tweet.id)}
+                        >
+                            {tweet.text}
+                        </Button>
+                    ))}
+                    {incorrectTiles.map(tweet => (
+                        <Button
+                            key={tweet.id}
+                            className={`py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md ${selectedTiles.includes(tweet.id) ? "bg-blue-100" : "bg-gray-100"}`}
+                            onClick={() => selectTweetTile(tweet.id)}
+                        >
+                            {tweet.text}
+                        </Button>
+                    ))}
+                </div>
+
+            {/* <div className="grid gap-3 grid-cols-4 grid-cols-4 px-3 py-4">
+            {correctTiles.map(tweet => (
+                    <Button
+                        key={tweet.id}
+                        className={`py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md bg-pink-500`}
+                        onClick={() => selectTweetTile(tweet.id)}
+                    >
+                        {tweet.text}
+                    </Button>
+                ))}
+                {incorrectTiles.map(tweet => (
                     <Button
                         key={tweet.id}
                         className={`py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md ${selectedTiles.includes(tweet.id) ? "bg-blue-100" : "bg-gray-100"}`}
@@ -331,7 +361,7 @@ export default function Main() {
                         {tweet.text}
                     </Button>
                 ))}
-            </div>
+            </div> */}
 
 
             <div className="inline-block">
@@ -342,6 +372,7 @@ export default function Main() {
                 <Button className={"active:bg-blue-300 border border-opacity-100 px-6 py-2 rounded-full border-black"} onClick={shuffleBoard}>Shuffle</Button>
                 <Button className={"active:bg-blue-300 border border-opacity-100 px-6 py-2 rounded-full border-black"} onClick={deselectAll}>Deselect All</Button>
                 <Button className={"active:bg-blue-500 border border-opacity-100 px-6 py-2 rounded-full border-black"} onClick = {submitGuesses}>Submit</Button>
+                <Button className={"active:bg-blue-500 border border-opacity-100 px-6 py-2 rounded-full border-black"}>?</Button>
             </div>
         </div>
     )
