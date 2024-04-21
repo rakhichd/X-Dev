@@ -1,13 +1,34 @@
-import React, { useState, useEffect }  from "react"
-import Button from "../Button/Button" 
+import React, { useState, useEffect } from "react"
+import Button from "../Button/Button"
+import getTweets from "../../api/getTweets";
+import { useGlobalState, setGlobalState } from "../../state/state";
 
-export default function StartPage({handleStartGame}) {
+export default function StartPage({ handleStartGame, setIncorrectTiles, shuffle, setStart }) {
 
     const [gameStarted, setGameStarted] = useState(false);
+    const [people] = useGlobalState("people")
 
-    const handleGame = () => {
+    const handleGame = async () => {
         setGameStarted(true);
-        // Add any additional logic to start the game here
+        const { resultJson } = await getTweets([], 2020)
+        const tweetsArray = [];
+        for (const user in resultJson) {
+            if (user == "profile_images") {
+                continue;
+            }
+            const userTweets = resultJson[user];
+            for (const tweetIndex in userTweets) {
+                const tweet = userTweets[tweetIndex];
+                tweetsArray.push({
+                    user: user,
+                    id: tweet.id,
+                    text: tweet.text,
+                });
+            }
+        }
+        setIncorrectTiles(shuffle(tweetsArray))
+        setStart(false)
+        setGameStarted(false)
     };
 
     return (
