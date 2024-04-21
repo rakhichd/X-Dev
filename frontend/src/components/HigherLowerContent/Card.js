@@ -2,7 +2,7 @@ import Button from "../Button/Button";
 
 export default function Card({ text, likes, shown, setCurrent }) {
   return (
-    <div className="flex-grow-0 flex-shrink-0 w-1/2 h-full bg-blue-300">
+    <div className="flex-grow-0 flex-shrink-0 w-[50%] h-full bg-blue-300">
       {shown ? (
         <div className="flex flex-col items-center justify-center h-full">
           <h1 className="text-center font-semibold text-5xl mb-5">{text}</h1>

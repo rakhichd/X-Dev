@@ -70,11 +70,15 @@ export default function Main() {
       selectedTiles.includes(tweet.id)
     );
     const corr = correctTiles.concat(allGtiles);
-    console.log(corr);
     setCorrectTiles(corr);
     const allStillWrong = incorrectTiles.filter(
       (tweet) => !corr.map((t) => t.id).includes(tweet.id)
     );
+    console.log(allStillWrong)
+    if (allStillWrong.length == 0) {
+        console.log("hi")
+        setDone(true)
+    }
     setIncorrectTiles(allStillWrong);
     setSelectedTiles([]);
   }
