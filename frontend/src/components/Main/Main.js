@@ -10,7 +10,6 @@ import getHint from "../../api/getHint.js";
 export default function Main() {
   const [mistakesRemaining, setMistakesRemaining] = useState(4);
   const [selectedTiles, setSelectedTiles] = useState([]);
-  const [tweets, setTweets] = useState([]);
   const [correctTiles, setCorrectTiles] = useState([]);
   const [incorrectTiles, setIncorrectTiles] = useState([]);
   const [done, setDone] = useState(false);
@@ -70,14 +69,17 @@ export default function Main() {
       selectedTiles.includes(tweet.id)
     );
     const corr = correctTiles.concat(allGtiles);
-    console.log(corr);
     setCorrectTiles(corr);
     const allStillWrong = incorrectTiles.filter(
       (tweet) => !corr.map((t) => t.id).includes(tweet.id)
     );
     setIncorrectTiles(allStillWrong);
     setSelectedTiles([]);
+    if (allStillWrong.length < 4) {
+        setDone(true);
+    }
   }
+  console.log(done);
 
   function submitGuesses() {
     const arrG = incorrectTiles.filter((tweet) =>
@@ -87,6 +89,9 @@ export default function Main() {
     if (arrG.length === 4) {
       if (users.every((user) => user === users[0])) {
         correctGuess();
+        if (incorrectTiles.length === 4) {
+            setDone(true);
+        }
         return true;
       } else {
         users.sort();
