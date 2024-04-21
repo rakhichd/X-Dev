@@ -314,7 +314,7 @@ export default function Main() {
                 console.log("true");
                 return true; // All selected tweets have the same user
             } else {
-                deselectAll();
+                //deselectAll();
                 setMistakesRemaining(mistakesRemaining -1);
                 if (mistakesRemaining === 1) {
                     setDone(true);
@@ -330,7 +330,7 @@ export default function Main() {
         <div className="max-w-[100rem] ml-auto mr-auto">
 
 
-            {!done ? <> <div className="grid gap-3 grid-cols-4 px-3 py-4">
+            {!done ? <> <div className="grid gap-3 grid-cols-4 px-3 py-4 mt-10">
                 {correctTiles.slice(0, 4).map(tweet => (
                     <Button
                         key={tweet.id}
