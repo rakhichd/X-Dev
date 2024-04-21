@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, redirect, session
+from flask import Flask, request, jsonify, redirect, session, url_for
 from flask_cors import CORS
 import tweepy
 import heapq
@@ -46,9 +46,13 @@ app.config['APP_CONSUMER_SECRET'] = os.getenv('TWAUTH_APP_CONSUMER_SECRET', 'API
 
 oauth_store = {}
 
-client = tweepy.Client(bearer_token="AAAAAAAAAAAAAAAAAAAAAIShtQEAAAAAX5yH8Y5AT6WB5RtgNuNuqBJwY30%3DOqrBQEx2w81UOBuINmPO5bBb73jW1V44yMwkJ5JoqmzGR3fCwU",
-                        consumer_key="wDcdhO9o75G5ZFsnMnFK16LTS",
-                        consumer_secret="rsQf7GMYLORyXDaoYbHDigLvlMhdJRPDRE1A2MMsT1CjiD6Veb")
+# client = tweepy.Client(bearer_token="AAAAAAAAAAAAAAAAAAAAAIShtQEAAAAAX5yH8Y5AT6WB5RtgNuNuqBJwY30%3DOqrBQEx2w81UOBuINmPO5bBb73jW1V44yMwkJ5JoqmzGR3fCwU",
+#                         consumer_key="wDcdhO9o75G5ZFsnMnFK16LTS",
+#                         consumer_secret="rsQf7GMYLORyXDaoYbHDigLvlMhdJRPDRE1A2MMsT1CjiD6Veb")
+
+bearer_token="AAAAAAAAAAAAAAAAAAAAAIShtQEAAAAAX5yH8Y5AT6WB5RtgNuNuqBJwY30%3DOqrBQEx2w81UOBuINmPO5bBb73jW1V44yMwkJ5JoqmzGR3fCwU",
+consumer_key="wDcdhO9o75G5ZFsnMnFK16LTS",
+consumer_secret="rsQf7GMYLORyXDaoYbHDigLvlMhdJRPDRE1A2MMsT1CjiD6Veb"
 
 request_token_url = 'https://api.twitter.com/oauth/request_token'
 access_token_url = 'https://api.twitter.com/oauth/access_token'
@@ -56,12 +60,17 @@ authorize_url = 'https://api.twitter.com/oauth/authorize'
 show_user_url = 'https://api.twitter.com/1.1/users/show.json'
 app_callback_url = 'https://6b7f-8-25-197-34.ngrok-free.app/callback' # Hardcoded to backend server
 
-# screen_name = None
-# user_id = None
-
 datetime_format = "%Y-%m-%dT%H:%M:%SZ"
 
-# Routes
+def get_client():
+    client = tweepy.Client(bearer_token="AAAAAAAAAAAAAAAAAAAAAIShtQEAAAAAX5yH8Y5AT6WB5RtgNuNuqBJwY30%3DOqrBQEx2w81UOBuINmPO5bBb73jW1V44yMwkJ5JoqmzGR3fCwU",
+                        consumer_key="wDcdhO9o75G5ZFsnMnFK16LTS",
+                        consumer_secret="rsQf7GMYLORyXDaoYbHDigLvlMhdJRPDRE1A2MMsT1CjiD6Veb",
+                        access_token=session["access_token"],
+                        access_token_secret=session["access_token_secret"])
+    return client
+
+# Not used
 @app.route('/')
 def hello():
 
@@ -83,6 +92,14 @@ def hello():
     oauth_store[oauth_token] = oauth_token_secret
 
     return redirect(f"{authorize_url}?oauth_token={oauth_token}")
+
+# Verify if user is logged in
+@app.route('/verify')
+def verify():
+    if "screen_name" not in session:
+        redirect('http://localhost:3000/')
+    else:
+        return jsonify({"message": "User logged in"}, 200)
 
 @app.route('/authenticate')
 def authenticate():
@@ -144,14 +161,11 @@ def callback():
     session["user_id"] = access_token[b'user_id'].decode('utf-8')
 
     # These are the tokens you would store long term, someplace safe
-    session["real_oauth_token"] = access_token[b'oauth_token'].decode('utf-8')
-    session["real_oauth_token_secret"] = access_token[b'oauth_token_secret'].decode('utf-8')
+    session["access_token"] = access_token[b'oauth_token'].decode('utf-8')
+    session["access_token_secret"] = access_token[b'oauth_token_secret'].decode('utf-8')
     
     # don't keep this token and secret in memory any longer
     del oauth_store[oauth_token]
-
-    client.access_token = session["real_oauth_token"]
-    client.access_token_secret = session["real_oauth_token_secret"]
     
     return redirect('http://localhost:3000/whosaidthat')
 
@@ -181,6 +195,7 @@ def generate_game():
         results[user] = getTopTweets(user, start_time, end_time, 4)
         
         # Get profile image of user
+        client = get_client()
         user_info = client.get_user(username=user, user_fields=['profile_image_url'])
         results["profile_images"][user] = user_info.data['profile_image_url']
     
@@ -197,6 +212,7 @@ def getTopTweets(username, start_time, end_time, num_tweets):
     query = f'from: {username} -is:retweet -has:links'
 
     time.sleep(0.8)
+    client = get_client()
     tweets = client.search_all_tweets(query=query, tweet_fields=['context_annotations', 'created_at', 'public_metrics', 'author_id'],
                                   start_time=start_time,
                                   end_time=end_time, max_results=100)
@@ -261,8 +277,8 @@ async def hint():
     data = request.json
     hinted_user = data.get('hinted_user')
 
-    client = xai_sdk.Client()
-    sampler = client.sampler
+    api = xai_sdk.Client()
+    sampler = api.sampler
 
     PREAMBLE = """\
     Human: I want you to share some fun facts about this person and these fun facts SHOULD NOT INCLUDE THE PERSON'S NAME.
@@ -278,7 +294,7 @@ async def hint():
     prompt = PREAMBLE + f"<|separator|>\n\nHuman: {hinted_user}<|separator|>\n\nAssistant: "
 
     output = ""
-    async for token in  sampler.sample(
+    async for token in sampler.sample(
         prompt=prompt,
         max_len=50,
         stop_tokens=["<|separator|>"],
@@ -299,6 +315,7 @@ def interact_tweet():
     author_id = data.get('author_id')
     assert interact_type in [0, 1, 2] # 0: following, 1: like, 2: retweet
 
+    client = get_client()
     if interact_type == 0:
         client.follow_user(target_user_id=author_id, user_auth=True)
     elif interact_type == 1:
