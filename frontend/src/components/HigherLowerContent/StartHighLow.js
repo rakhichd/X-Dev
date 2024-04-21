@@ -1,19 +1,18 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import Button from "../Button/Button"
-import getTweets from "../../api/getTweets";
+import getHighLow from "../../api/getHighLow";
+import { useGlobalState, setGlobalState } from "../../state/state";
 
-export default function StartPage({ setIncorrectTiles, shuffle, setStart }) {
+export default function StartHighLow({ setStart, setPosts }) {
 
     const [gameStarted, setGameStarted] = useState(false);
 
     const handleGame = async () => {
         setGameStarted(true);
-        const { resultJson } = await getTweets([], 2020)
+        const { resultJson } = await getHighLow()
+        console.log(resultJson)
         const tweetsArray = [];
         for (const user in resultJson) {
-            if (user == "profile_images") {
-                continue;
-            }
             const userTweets = resultJson[user];
             for (const tweetIndex in userTweets) {
                 const tweet = userTweets[tweetIndex];
@@ -21,11 +20,13 @@ export default function StartPage({ setIncorrectTiles, shuffle, setStart }) {
                     user: user,
                     id: tweet.id,
                     text: tweet.text,
+                    likes: tweet.metrics.like_count
                 });
             }
         }
-        setIncorrectTiles(shuffle(tweetsArray))
-        setStart(false)
+        console.log(tweetsArray)
+        setPosts(tweetsArray)
+        setStart(true)
         setGameStarted(false)
     };
 

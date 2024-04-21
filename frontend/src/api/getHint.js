@@ -1,5 +1,4 @@
 const getHint = async ({ user }) => {
-    console.log("hi")
   const result = await fetch("https://6b7f-8-25-197-34.ngrok-free.app/hint", {
     method: "POST",
     headers: {
