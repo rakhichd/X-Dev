@@ -83,21 +83,30 @@ export default function Main() {
     const arrG = incorrectTiles.filter((tweet) =>
       selectedTiles.includes(tweet.id)
     );
-    console.log(arrG);
+    const users = arrG.map((tweet) => tweet.user);
     if (arrG.length === 4) {
-      const users = arrG.map((tweet) => tweet.user);
       if (users.every((user) => user === users[0])) {
         correctGuess();
-        console.log("true");
         return true;
       } else {
-        deselectAll();
+        users.sort();
+        let countArr = 0;
+        for (let i = 0; i < users.length-1; i++) {
+            if (users[i] === users[i+1]) {
+                countArr = countArr + 1;
+                }
+            }
+            if (countArr === 2) {
+                setOneAway(true);
+            }
         setMistakesRemaining(mistakesRemaining - 1);
+        if (mistakesRemaining === 1) {
+            setDone(true);
       }
     }
-    console.log("false");
     return false;
   }
+}
 
   const CustomizeButton = ({ width }) => {
     return (

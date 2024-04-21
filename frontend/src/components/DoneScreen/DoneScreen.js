@@ -1,17 +1,28 @@
 import React, { useState, useEffect }  from "react"
 import Button from "../Button/Button"
 import { FaRetweet } from "react-icons/fa6";
-import { IoMdHeartEmpty } from "react-icons/io";
+
+import interactTweet from "../../api/interactTweet";
+import getTweets from "../../api/getTweets";
+import Heart from "./Heart.js"
+import Following from "./Following.js"
+
 
 
 
 export default function DoneScreen() {
 
+    const handleInteract = async (interact_type, tweet_id, author_id) => {
+        
+        const { resultJson } = await interactTweet(interact_type, tweet_id, author_id);
+        
+    };
+
     const tweetsByUser = {
           "DevinBook": {
             "0": {
-              "author_id": 237073728,
-              "id": 1620863399466004483,
+              "author_id": "237073728",
+              "id": "1620863399466004483",
               "metrics": {
                 "bookmark_count": 14,
                 "impression_count": 1463455,
@@ -23,8 +34,8 @@ export default function DoneScreen() {
               "text": "Roundin\u2019 3rd"
             },
             "1": {
-              "author_id": 237073728,
-              "id": 1613049011296161793,
+              "author_id": "237073728",
+              "id": "1613049011296161793",
               "metrics": {
                 "bookmark_count": 80,
                 "impression_count": 2144845,
@@ -36,8 +47,8 @@ export default function DoneScreen() {
               "text": "What kinda question was that"
             },
             "2": {
-              "author_id": 237073728,
-              "id": 1618481636794068994,
+              "author_id": "237073728",
+              "id": "1618481636794068994",
               "metrics": {
                 "bookmark_count": 35,
                 "impression_count": 1519695,
@@ -49,8 +60,8 @@ export default function DoneScreen() {
               "text": "Damn dame"
             },
             "3": {
-              "author_id": 237073728,
-              "id": 1611097669828759553,
+              "author_id": "237073728",
+              "id": "1611097669828759553",
               "metrics": {
                 "bookmark_count": 502,
                 "impression_count": 5789453,
@@ -64,8 +75,8 @@ export default function DoneScreen() {
           },
           "KingJames": {
             "0": {
-              "author_id": 23083404,
-              "id": 1610123473786912768,
+              "author_id": "23083404",
+              "id": "1610123473786912768",
               "metrics": {
                 "bookmark_count": 117,
                 "impression_count": 8907248,
@@ -77,8 +88,8 @@ export default function DoneScreen() {
               "text": "\ud83d\udd77\ufe0f you're INSANE!!!!! \ud83d\udc4f\ud83c\udffe\ud83d\udc4f\ud83c\udffe\ud83d\udc4f\ud83c\udffe\ud83d\udc4f\ud83c\udffe"
             },
             "1": {
-              "author_id": 23083404,
-              "id": 1619143671303266304,
+              "author_id": "23083404",
+              "id": "1619143671303266304",
               "metrics": {
                 "bookmark_count": 818,
                 "impression_count": 27106812,
@@ -90,8 +101,8 @@ export default function DoneScreen() {
               "text": "WE ARE OUR OWN WORSE ENEMY!!!"
             },
             "2": {
-              "author_id": 23083404,
-              "id": 1619585191055618049,
+              "author_id": "23083404",
+              "id": "1619585191055618049",
               "metrics": {
                 "bookmark_count": 635,
                 "impression_count": 21630254,
@@ -103,8 +114,8 @@ export default function DoneScreen() {
               "text": "That one hurt BIG TIME!!! I don't understand"
             },
             "3": {
-              "author_id": 23083404,
-              "id": 1621628645721755650,
+              "author_id": "23083404",
+              "id": "1621628645721755650",
               "metrics": {
                 "bookmark_count": 662,
                 "impression_count": 33847713,
@@ -118,8 +129,8 @@ export default function DoneScreen() {
           },
           "StephenCurry30": {
             "0": {
-              "author_id": 42562446,
-              "id": 1617953991144648704,
+              "author_id": "42562446",
+              "id": "1617953991144648704",
               "metrics": {
                 "bookmark_count": 0,
                 "impression_count": 5234,
@@ -131,8 +142,8 @@ export default function DoneScreen() {
               "text": "@BostonSchools @tbaupdates @AthleticsBPS Buckets!!"
             },
             "1": {
-              "author_id": 42562446,
-              "id": 1620481491183742976,
+              "author_id": "42562446",
+              "id": "1620481491183742976",
               "metrics": {
                 "bookmark_count": 0,
                 "impression_count": 7994,
@@ -152,8 +163,8 @@ export default function DoneScreen() {
           },
           "stephenasmith": {
             "0": {
-              "author_id": 16302242,
-              "id": 1612626364234084352,
+              "author_id": "16302242",
+              "id": "1612626364234084352",
               "metrics": {
                 "bookmark_count": 23,
                 "impression_count": 1551242,
@@ -165,8 +176,8 @@ export default function DoneScreen() {
               "text": "See, this is what ticks me off. I knew @TCUFootball was the inferior team \u2014 but I went with the Cinderella pick. A loss is cool, especially to a powerhouse like @GeorgiaFootball. But to get your ass kicked shows me ya never belonged in the game to begin with.#Damn!"
             },
             "1": {
-              "author_id": 16302242,
-              "id": 1615812590680289280,
+              "author_id": "16302242",
+              "id": "1615812590680289280",
               "metrics": {
                 "bookmark_count": 212,
                 "impression_count": 6822499,
@@ -178,8 +189,8 @@ export default function DoneScreen() {
               "text": "Has been removed. My social management team will never make a mistake like this again. My apologies again to @Rihanna. And just to be clear, I\u2019m a huge fan. Sherri and I were just having fun. That is all."
             },
             "2": {
-              "author_id": 16302242,
-              "id": 1614480276381384706,
+              "author_id": "16302242",
+              "id": "1614480276381384706",
               "metrics": {
                 "bookmark_count": 126,
                 "impression_count": 3833824,
@@ -191,8 +202,8 @@ export default function DoneScreen() {
               "text": "Congratulations @SeanPayton. Welcome to Los Angeles as the new coach is the @chargers. There is no way Brandon Staley can keep his job after blowing this lead. There\u2019s no coming back from this for him!"
             },
             "3": {
-              "author_id": 16302242,
-              "id": 1610117980913909762,
+              "author_id": "16302242",
+              "id": "1610117980913909762",
               "metrics": {
                 "bookmark_count": 44,
                 "impression_count": 2849379,
@@ -237,9 +248,10 @@ export default function DoneScreen() {
                         className = "rounded-full h-20 w-20 mr-5"
                     />
                     {users[currentIndex]} 
-                    <Button className = "hover:bg-gray-800 border border-opacity-100 px-3 py-1 rounded-full border-black bg-black text-white text-sm ml-4"> 
-                        Follow 
-                    </Button></h2>
+                        <div onClick={() => handleInteract(0, 0, tweetsByUser[users[currentIndex]].author_id)}> 
+                                <Following></Following>
+                        </div>
+                    </h2>
                 <button onClick={handleNext} className="text-gray-500 hover:bg-gray-100 rounded-full py-3 px-5">
                     Next
                 </button>
@@ -252,20 +264,21 @@ export default function DoneScreen() {
                         )}
 
                         <div className="flex items-end justify-center gap-3">
-                            <Button className="rounded-full p-1 hover:bg-green-100">
+                            <Button onClick = {() => handleInteract(2, tweetsByUser[users[currentIndex]][idx].id, 0)} className="rounded-full p-1 hover:bg-green-100">
                                 <FaRetweet />
                             </Button>
                             <p className="text-gray-500 text-sm mt-2 rounded-full p-1 hover:bg-transparent">@{users[currentIndex]}</p>
-                            <Button className="rounded-full p-1 hover:bg-red-100">
-                                <IoMdHeartEmpty />
-                            </Button>
+                            <div 
+                            onClick={() => handleInteract(1, tweetsByUser[users[currentIndex]][idx].id, 0)}
+                            > 
+                                <Heart></Heart>
+                            </div>
                         </div>
-
                     </div>
                 ))}
             </div>
-            <div className="mt-10">
-                <div className="animate-pulse">
+            <div className="mt-10 flex items-center justify-center">
+                <div className="animate-pulse text-red-800 text-4xl font-extrabold">
                     Game Over.
                 </div>
             </div>
