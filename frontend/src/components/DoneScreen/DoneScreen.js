@@ -301,12 +301,12 @@ export default function DoneScreen({ tweetsByUser}) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {Object.values(tweetsByUser[users[currentIndex]]).map((tweet, idx) => (
-                    <div key={idx} className="bg-blue-100 p-4 rounded-lg shadow">
+                    <div key={idx} className="bg-blue-100 p-4 rounded-lg shadow relative pb-8">
                         {tweet.author_id && (
                             <p className="font-semibold">{tweet.text}</p>
                         )}
 
-                        <div className="flex items-end justify-center gap-3">
+                        <div className="flex items-end justify-center gap-3 absolute bottom-3 w-full right-1">
                             <Button onClick = {() => handleInteract(2, tweetsByUser[users[currentIndex]][idx].id, 0)} className="rounded-full p-1 hover:bg-green-100">
                                 <FaRetweet />
                             </Button>

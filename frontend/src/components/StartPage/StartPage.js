@@ -40,6 +40,23 @@ export default function StartPage({
     setFullArr(fullArr);
   };
 
+  const CustomizeButton = ({ width }) => {
+    return (
+      <button
+        className={`flex flex-row items-center h-14 bg-white p-3 rounded-full mb-[6px] border border-black hover:bg-gray-200 duration-200 `}
+        onClick={() => {
+          setGlobalState("showAddPeople", true);
+          setGlobalState("showSideBar", false);
+        }}
+      >
+        <FaUserFriends className="text-lg w-[24px] text-[#7289da] mr-2" />
+        <span className="whitespace-nowrap overflow-hidden">
+          <span className="text-black font-semibold text-lg">Customize</span>
+        </span>
+      </button>
+    );
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       {!gameStarted ? (
@@ -52,7 +69,7 @@ export default function StartPage({
           <div className="flex gap-3">
             <Button
               className={
-                "hover:bg-gray-100 h-14 duration-200 border border-opacity-100 px-6 py-2 rounded-full border-black text-lg"
+                "hover:bg-gray-100 h-14 duration-200 border border-opacity-100 px-6 py-2 rounded-full border-black text-md"
               }
               onClick={handleGame}
             >

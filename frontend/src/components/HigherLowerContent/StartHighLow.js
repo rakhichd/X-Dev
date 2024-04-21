@@ -29,11 +29,22 @@ export default function StartHighLow({ setStart, setPosts }) {
                 });
             }
         }
-        console.log(tweetsArray)
-        setPosts(tweetsArray)
+        setPosts(shuffle(tweetsArray))
         setStart(true)
         setGameStarted(false)
     };
+
+    function shuffle(array) {
+        const shuffledArray = [...array];
+        for (let i = shuffledArray.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffledArray[i], shuffledArray[j]] = [
+            shuffledArray[j],
+            shuffledArray[i],
+          ];
+        }
+        return shuffledArray;
+      }
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -43,7 +54,7 @@ export default function StartHighLow({ setStart, setPosts }) {
                     <Button className={"hover:bg-gray-200 duration-200 border border-opacity-100 px-6 py-2 rounded-full border-black"} onClick={handleGame}>Start Game</Button>
                 </div>
             ) : (
-                <div>
+                <div className="mt-[200px]">
                     <p>Game is starting...</p>
                 </div>
             )}
