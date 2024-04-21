@@ -11,8 +11,8 @@ const CustomizeButton = ({ width }) => {
     <button
       className={`flex flex-row w-full items-center bg-white bg-opacity-10 p-2 rounded-[4px] mb-[6px] border border-white border-opacity-10 hover:bg-opacity-[.15] `}
       onClick={() => {
+        setGlobalState("showAddPeople", true)
         setGlobalState("showSideBar", false);
-
       }}
     >
       <FaUserFriends className="text-lg w-[24px] text-[#7289da] mr-2" />
@@ -20,7 +20,6 @@ const CustomizeButton = ({ width }) => {
         <span className="text-white font-semibold">Customize</span>
         <span> - Play With Friends</span>
       </span>
-
     </button>
   )
 }
