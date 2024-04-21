@@ -4,13 +4,12 @@ import { PolygonCard } from "react-awesome-shapes/dist/shapes/polygonCard";
 import { CircleGrid } from "react-awesome-shapes/dist/shapes/circlegrid";
 import { Circle } from "react-awesome-shapes/dist/shapes/circle";
 import { Button } from "../components";
-import signIn from "../api/signIn";
+import {signIn} from "../api";
 
 export default function LandingPage() {
   const handleClick = async () => {
     const { resultJson } = await signIn();
-    console.log(resultJson[0].link)
-    const url = resultJson[0].link
+    const url = resultJson.link
     window.location.href = url;
   };
 

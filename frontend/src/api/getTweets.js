@@ -10,7 +10,7 @@ const getTweets = async (people, start, end) => {
     }
   };
 
-  const result = await fetch("https://e2d3-8-25-197-34.ngrok-free.app/generate_game", {
+  const result = await fetch("https://6b7f-8-25-197-34.ngrok-free.app/generate_game", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -19,7 +19,7 @@ const getTweets = async (people, start, end) => {
         custom_users: people,
         start_time: formatDate(start),
         end_time: formatDate(end)
-    })
+    }),
   });
   const resultJson = await result.json();
   const resultStatus = result.status;
