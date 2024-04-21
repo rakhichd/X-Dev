@@ -1,0 +1,19 @@
+POST http://127.0.0.1:5000/generate_game
+Content-Type: application/json
+
+{"custom_users": ["KingJames", "stephenasmith", "DevinBook", "StephenCurry30"], 
+"start_time": "2023-01-01T00:00:00Z", "end_time": "2023-08-01T00:00:00Z"}
+
+###
+
+POST http://127.0.0.1:5000/hint
+Content-Type: application/json
+
+{"hinted_user": "elonmusk"}
+
+###
+
+POST http://127.0.0.1:5000/generate_higherlower
+Content-Type: application/json
+
+{}
