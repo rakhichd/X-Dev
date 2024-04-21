@@ -7,9 +7,14 @@ import { setGlobalState, useGlobalState } from "../../state/state";
 export default function AddPeople() {
   const [people] = useGlobalState("people");
   const [form, setForm] = useState("");
+  const [start, setStart] = useState("2023");
 
   const handleChange = (event) => {
     setForm(event.target.value);
+  };
+
+  const handleStart = (event) => {
+    setStart(event.target.value);
   };
 
   const handleDone = () => {
@@ -21,6 +26,7 @@ export default function AddPeople() {
     }
     const combined = p.concat(people);
     setGlobalState("people", combined);
+    setGlobalState("startDate", start)
     setForm("");
     setGlobalState("showAddPeople", false);
   };
@@ -45,7 +51,10 @@ export default function AddPeople() {
 
   const CloseModal = () => {
     return (
-      <div className="absolute right-6 cursor-pointer" onClick={() => setGlobalState("showAddPeople", false)}>
+      <div
+        className="absolute right-6 cursor-pointer"
+        onClick={() => setGlobalState("showAddPeople", false)}
+      >
         <RxCross1 />
       </div>
     );
@@ -83,6 +92,19 @@ export default function AddPeople() {
               </div>
             )}
           </h1>
+        </div>
+        <div className="flex items-center gap-3 mt-5">
+          <div>
+            <h1 className="text-xl">Year:</h1>
+          </div>
+          <div className="flex gap-2">
+            <TextInput
+              value={start}
+              onChange={handleStart}
+              placeholder="Enter year..."
+              className="w-32 text-center"
+            />
+          </div>
         </div>
         <Button
           className="bg-black hover:opacity-80 duration-200 px-5 py-2 mt-3 rounded-md text-white"
