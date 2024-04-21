@@ -2,10 +2,21 @@ import React, { useState, useEffect }  from "react"
 import Button from "../Button/Button"
 import { FaRetweet } from "react-icons/fa6";
 import { IoMdHeartEmpty } from "react-icons/io";
+import interactTweet from "../../api/interactTweet";
+import getTweets from "../../api/getTweets";
 
 
 
 export default function DoneScreen() {
+
+    const handleInteract = async (interact_type, tweet_id, author_id) => {
+        
+        const { resultJson } = await interactTweet(interact_type, tweet_id, author_id);
+        
+        
+    };
+
+    
 
     const tweetsByUser = {
           "DevinBook": {
@@ -237,7 +248,7 @@ export default function DoneScreen() {
                         className = "rounded-full h-20 w-20 mr-5"
                     />
                     {users[currentIndex]} 
-                    <Button className = "hover:bg-gray-800 border border-opacity-100 px-3 py-1 rounded-full border-black bg-black text-white text-sm ml-4"> 
+                    <Button onClick = {() => handleInteract(0, 0, tweetsByUser[users[currentIndex]][0].author_id)} className = "hover:bg-gray-800 border border-opacity-100 px-3 py-1 rounded-full border-black bg-black text-white text-sm ml-4"> 
                         Follow 
                     </Button></h2>
                 <button onClick={handleNext} className="text-gray-500 hover:bg-gray-100 rounded-full py-3 px-5">
@@ -252,11 +263,11 @@ export default function DoneScreen() {
                         )}
 
                         <div className="flex items-end justify-center gap-3">
-                            <Button className="rounded-full p-1 hover:bg-green-100">
+                            <Button onClick = {() => handleInteract(2, tweetsByUser[users[currentIndex]][idx].id, 0)} className="rounded-full p-1 hover:bg-green-100">
                                 <FaRetweet />
                             </Button>
                             <p className="text-gray-500 text-sm mt-2 rounded-full p-1 hover:bg-transparent">@{users[currentIndex]}</p>
-                            <Button className="rounded-full p-1 hover:bg-red-100">
+                            <Button onClick = {() => handleInteract(1, tweetsByUser[users[currentIndex]][idx].id, 0)} className="rounded-full p-1 hover:bg-red-100">
                                 <IoMdHeartEmpty />
                             </Button>
                         </div>
