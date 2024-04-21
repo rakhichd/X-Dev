@@ -10,13 +10,13 @@ import getHint from "../../api/getHint.js";
 export default function Main() {
   const [mistakesRemaining, setMistakesRemaining] = useState(4);
   const [selectedTiles, setSelectedTiles] = useState([]);
-  const [tweets, setTweets] = useState([]);
   const [correctTiles, setCorrectTiles] = useState([]);
   const [incorrectTiles, setIncorrectTiles] = useState([]);
   const [done, setDone] = useState(false);
   const [oneAway, setOneAway] = useState(false);
   const [start, setStart] = useState(true);
   const [hint, setHint] = useState("");
+  const [fullArr, setFullArr] = useState({});
 
   function shuffle(array) {
     const shuffledArray = [...array];
@@ -44,6 +44,16 @@ export default function Main() {
   function deselectAll() {
     return setSelectedTiles([]);
   }
+
+  useEffect(() => {
+    let timer;
+    if (oneAway) {
+      timer = setTimeout(() => {
+        setOneAway(false);
+      }, 5000); // 20 seconds
+    }
+    return () => clearTimeout(timer);
+  }, [oneAway]);
 
   const selectTweetTile = (id) => {
     setSelectedTiles((prev) => {
@@ -74,13 +84,16 @@ export default function Main() {
     const allStillWrong = incorrectTiles.filter(
       (tweet) => !corr.map((t) => t.id).includes(tweet.id)
     );
-    console.log(allStillWrong)
+    console.log(allStillWrong);
     if (allStillWrong.length == 0) {
-        console.log("hi")
-        setDone(true)
+      console.log("hi");
+      setDone(true);
     }
     setIncorrectTiles(allStillWrong);
     setSelectedTiles([]);
+    if (allStillWrong.length < 4) {
+      setDone(true);
+    }
   }
 
   function submitGuesses() {
@@ -95,22 +108,22 @@ export default function Main() {
       } else {
         users.sort();
         let countArr = 0;
-        for (let i = 0; i < users.length-1; i++) {
-            if (users[i] === users[i+1]) {
-                countArr = countArr + 1;
-                }
-            }
-            if (countArr === 2) {
-                setOneAway(true);
-            }
+        for (let i = 0; i < users.length - 1; i++) {
+          if (users[i] === users[i + 1]) {
+            countArr = countArr + 1;
+          }
+        }
+        if (countArr === 2) {
+          setOneAway(true);
+        }
         setMistakesRemaining(mistakesRemaining - 1);
         if (mistakesRemaining === 1) {
-            setDone(true);
+          setDone(true);
+        }
       }
+      return false;
     }
-    return false;
   }
-}
 
   return (
     <div className="max-w-[100rem] ml-auto mr-auto flex flex-col items-center">
@@ -122,6 +135,7 @@ export default function Main() {
                 setStart={setStart}
                 setIncorrectTiles={setIncorrectTiles}
                 shuffle={shuffle}
+                setFullArr={setFullArr}
               ></StartPage>
             </>
           ) : (
@@ -230,7 +244,7 @@ export default function Main() {
         </>
       ) : (
         <>
-          <DoneScreen></DoneScreen>
+          <DoneScreen tweetsByUser={fullArr} />
         </>
       )}
     </div>

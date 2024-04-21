@@ -20,6 +20,7 @@ const getTweets = async (people, start, end) => {
         start_time: formatDate(start),
         end_time: formatDate(end)
     }),
+    credentials: "include"
   });
   const resultJson = await result.json();
   const resultStatus = result.status;
