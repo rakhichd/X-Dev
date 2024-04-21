@@ -1,17 +1,11 @@
+import React, { useState, useEffect }  from "react"
 import Button from "../Button/Button"
-import React, { useState, useEffect } from "react"
-import DoneScreen from "../DoneScrren/DoneScreen";
+import { FaRetweet } from "react-icons/fa6";
+import { IoMdHeartEmpty } from "react-icons/io";
 
-export default function Main() {
 
-    const [mistakesRemaining, setMistakesRemaining] = useState(4);
-    const [selectedTiles, setSelectedTiles] = useState([]);
-    const [tweets, setTweets] = useState([]);
-    const [correctTiles, setCorrectTiles] = useState([]);
-    const [incorrectTiles, setIncorrectTiles] = useState([]);
-    const [done, setDone] = useState(false);
-    const [winOrLose, setWinOrLose] = useState("");
-    const [oneAway, setOneAway] = useState(false);
+
+export default function DoneScreen({status}) {
 
     const tweetsByUser = {
         "DevinBook": {
@@ -216,204 +210,57 @@ export default function Main() {
         }
     }
 
-    const tweetsArray = [];
+    const [currentIndex, setCurrentIndex] = useState(0);
 
-    for (const user in tweetsByUser) {
-        const userTweets = tweetsByUser[user];
-        for (const tweetId in userTweets) {
-            const tweet = userTweets[tweetId];
-            tweetsArray.push({
-                user: user,
-                id: tweet.id,
-                text: tweet.text
-            });
-        }
-    }
+    const users = Object.keys(tweetsByUser);
 
-    console.log(tweetsArray);
-
-    useEffect(() => {
-        const tweetsArray = [];
-        for (const user in tweetsByUser) {
-            const userTweets = tweetsByUser[user];
-            for (const tweetId in userTweets) {
-                const tweet = userTweets[tweetId];
-                tweetsArray.push({
-                    user: user,
-                    id: tweet.id,
-                    text: tweet.text
-                });
-            }
-        }
-        setIncorrectTiles(shuffle(tweetsArray));
-    }, [])
-
-    useEffect(() => {
-        let timer;
-        if (oneAway) {
-            timer = setTimeout(() => {
-                setOneAway(false);
-            }, 5000); // 20 seconds
-        }
-
-        return () => clearTimeout(timer);
-    }, [oneAway]);
-
-    function shuffle(array) {
-        const shuffledArray = [...array];
-        for (let i = shuffledArray.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-        }
-        return shuffledArray;
-    }
-    
-
-    const shuffleBoard = () => {
-        setIncorrectTiles(prev => shuffle(prev));
+    const handlePrev = () => {
+        setCurrentIndex((prevIndex) => (prevIndex === 0 ? users.length - 1 : prevIndex - 1));
     };
 
-    function deselectAll() {
-        return setSelectedTiles([]);
-    }
-
-
-    const selectTweetTile = (id) => {
-        setSelectedTiles(prev => {
-            if (prev.includes(id)) {
-                return prev.filter(tileId => tileId !== id); // Remove the ID if it's already in the array
-            } else if (prev.length < 4) {
-                return [...prev, id]; // Add the ID if it's not in the array and the array length is less than 4
-            }
-            return prev; // Return the original array if it doesn't meet the conditions
-        });
+    const handleNext = () => {
+        setCurrentIndex((prevIndex) => (prevIndex === users.length - 1 ? 0 : prevIndex + 1));
     };
-    
-    
-
-    function MistakesRemaining() { // num of dots to show up based on how many mistakes are remaining 
-        return (
-            <div className="flex gap-1 items-center">
-                {Array.from({ length: mistakesRemaining }).map((_, index) => (
-                    <div key={index} className="rounded-full h-4 w-4 bg-gray-500"></div>
-                ))}
-            </div>
-        );
-    }
-
-    function correctGuess() {
-        const allGtiles = incorrectTiles.filter(tweet => selectedTiles.includes(tweet.id));
-        const corr = correctTiles.concat(allGtiles);
-        console.log(corr);
-        setCorrectTiles(corr);
-        const allStillWrong = incorrectTiles.filter(tweet => !corr.map(t => t.id).includes(tweet.id));
-        setIncorrectTiles(allStillWrong);
-        console.log(tweets);
-        setSelectedTiles([]);
-        if (allStillWrong.length === 0) {
-            setDone(true);
-            setWinOrLose("win");
-        }
-    }
-
-    function submitGuesses() {
-        const arrG = incorrectTiles.filter(tweet => selectedTiles.includes(tweet.id)); // based on selected tiles, get the user,id,text
-        console.log(arrG);
-        const users = arrG.map(tweet => tweet.user);
-        if (arrG.length === 4) {
-            if (users.every(user => user === users[0])) {
-                correctGuess();
-                console.log("true");
-                return true; // All selected tweets have the same user
-            } else {
-                //deselectAll();
-                // check if three users are all the same 
-                users.sort();
-                let countArr = 0;
-                for (let i = 0; i < users.length-1; i++) {
-                    if (users[i] === users[i+1]) {
-                        countArr = countArr + 1;
-                    }
-                }
-                if (countArr === 2) {
-                    setOneAway(true);
-                }
-                console.log(countArr);
-                setMistakesRemaining(mistakesRemaining -1);
-                if (mistakesRemaining === 1) {
-                    setDone(true);
-                    setWinOrLose("lose");
-                }
-            }
-        } 
-        console.log("false");
-        return false; // Selected tweets do not have the same user or not all tweets are selected
-    }
 
     return (
-        <div className="max-w-[100rem] ml-auto mr-auto">
-
-            {!done ? <> 
-            {oneAway && <div className = "fade-out mt-6">One Away...</div>}
-            <div className="grid gap-3 grid-cols-4 px-3 py-4 mt-7">
-                {correctTiles.slice(0, 4).map(tweet => (
-                    <Button
-                        key={tweet.id}
-                        className="py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md bg-pink-100"
-                        onClick={() => selectTweetTile(tweet.id)}
-                    >
-                        {tweet.text}
-                    </Button>
-                ))}
-                {correctTiles.slice(4, 8).map(tweet => (
-                    <Button
-                        key={tweet.id}
-                        className="py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md bg-green-100"
-                        onClick={() => selectTweetTile(tweet.id)}
-                    >
-                        {tweet.text}
-                    </Button>
-                ))}
-                {correctTiles.slice(8, 12).map(tweet => (
-                    <Button
-                        key={tweet.id}
-                        className="py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md bg-yellow-100"
-                        onClick={() => selectTweetTile(tweet.id)}
-                    >
-                        {tweet.text}
-                    </Button>
-                ))}
-                {correctTiles.slice(12).map(tweet => (
-                    <Button
-                        key={tweet.id}
-                        className="py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md bg-purple-100"
-                        onClick={() => selectTweetTile(tweet.id)}
-                    >
-                        {tweet.text}
-                    </Button>
-                ))}
-                    {incorrectTiles.map(tweet => (
-                        <Button
-                            key={tweet.id}
-                            className={`py-3 px-1 rounded-lg overflow-scroll h-20 w-13 max-w-md ${selectedTiles.includes(tweet.id) ? "bg-blue-100" : "bg-gray-100"}`}
-                            onClick={() => selectTweetTile(tweet.id)}
-                        >
-                            {tweet.text}
-                        </Button>
-                    ))}
-                </div>
-
-            <div className="inline-block">
-                <div className="py-3 flex gap-2 "> <h1> Mistakes Remaining: </h1> <MistakesRemaining /> </div>
+        <div className="container mx-auto px-4 py-8">
+            <div className="flex justify-between items-center mb-4">
+                <button onClick={handlePrev} className="text-gray-500 hover:bg-gray-100 rounded-full py-3 px-6">
+                    Prev
+                </button>
+                <h2 className="text-2xl font-bold flex items-center">{users[currentIndex]} 
+                    <Button className = "hover:bg-gray-800 border border-opacity-100 px-3 py-1 rounded-full border-black bg-black text-white text-sm ml-4"> 
+                        Follow 
+                    </Button></h2>
+                <button onClick={handleNext} className="text-gray-500 hover:bg-gray-100 rounded-full py-3 px-5">
+                    Next
+                </button>
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {Object.values(tweetsByUser[users[currentIndex]]).map((tweet, idx) => (
+                    <div key={idx} className="bg-blue-100 p-4 rounded-lg shadow">
+                        <p className="font-semibold">{tweet.text}</p>
 
-            <div className="flex gap-2 place-content-center">
-                <Button className={"active:bg-blue-300 border border-opacity-100 px-6 py-2 rounded-full border-black"} onClick={shuffleBoard}>Shuffle</Button>
-                <Button className={"active:bg-blue-300 border border-opacity-100 px-6 py-2 rounded-full border-black"} onClick={deselectAll}>Deselect All</Button>
-                <Button className={"active:bg-blue-500 border border-opacity-100 px-6 py-2 rounded-full border-black"} onClick = {submitGuesses}>Submit</Button>
-                <Button className={"active:bg-blue-500 border border-opacity-100 px-6 py-2 rounded-full border-black"}>?</Button>
-            </div> </>: <DoneScreen> {winOrLose} </DoneScreen>
-                }
+                        <div className="flex items-end justify-center gap-3">
+                            <Button className="rounded-full p-1 hover:bg-green-100">
+                                <FaRetweet />
+                            </Button>
+                            <p className="text-gray-500 text-sm mt-2 rounded-full p-1 hover:bg-transparent">@{users[currentIndex]}</p>
+                            <Button className="rounded-full p-1 hover:bg-red-100">
+                                <IoMdHeartEmpty />
+                            </Button>
+                        </div>
+
+                    </div>
+                ))}
+            </div>
+            <div className="mt-10">
+                <div className="animate-pulse">
+                    Game Over.
+                </div>
+            </div>
         </div>
-    )
+    );
+
 }
+
