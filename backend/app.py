@@ -178,7 +178,26 @@ def generate_game():
     end_time = data.get('end_time') # end_time can be optionally none
     
     # Default users
-    users = ["elonmusk", "VancityReynolds", "KDTrey5", "NICKIMINAJ"]
+    default_users = ["elonmusk", "VancityReynolds", "KDTrey5", "NICKIMINAJ", "BarackObama", "neiltyson", "mcuban", "BernieSanders", "lexfridman", "MrBeast", "KingJames", "stephenasmith"]
+
+    # Generate random users
+    rand_user1 = user[random.randint(0, 11)]
+
+    rand_user2 = user[random.randint(0, 11)]
+    while rand_user2 == rand_user1:
+        rand_user2 = user[random.randint(0, 11)]
+
+    rand_user3 = user[random.randint(0, 11)]
+    while rand_user3 == rand_user2 or rand_user3 == rand_user1:
+        rand_user3 = user[random.randint(0, 11)]
+
+    rand_user4 = user[random.randint(0, 11)]
+    while rand_user4 == rand_user3 or rand_user4 == rand_user2 or rand_user4 == rand_user1:
+        rand_user4 = user[random.randint(0, 11)]
+
+    users = [rand_user1, rand_user2, rand_user3, rand_user4]
+
+
     # Override with custom users
     if custom_users:
         users = custom_users
@@ -328,8 +347,7 @@ def interact_tweet():
 # Not used
 @app.route("/generate_higherlower", methods=["POST"])
 def generate_higherlower():
-    usernames = ["elonmusk", "BarackObama", 
-                 "taylorswift13", "kanyewest", "KDTrey5"]
+    usernames = ["elonmusk", "BarackObama", "BernieSanders", "KDTrey5", "mcuban", "lexfridman", "MrBeast", "KingJames", "stephenasmith"]
     
     # Get top 8 tweets within the year for a particular celebrity
     time_now = datetime.now()
