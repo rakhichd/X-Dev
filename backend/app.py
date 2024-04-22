@@ -58,7 +58,7 @@ request_token_url = 'https://api.twitter.com/oauth/request_token'
 access_token_url = 'https://api.twitter.com/oauth/access_token'
 authorize_url = 'https://api.twitter.com/oauth/authorize'
 show_user_url = 'https://api.twitter.com/1.1/users/show.json'
-app_callback_url = 'https://6b7f-8-25-197-34.ngrok-free.app/callback' # Hardcoded to backend server
+app_callback_url = 'https://444e-8-25-197-34.ngrok-free.app/callback' # Hardcoded to backend server
 
 datetime_format = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -99,7 +99,7 @@ def verify():
     if "screen_name" not in session:
         redirect('http://localhost:3000/')
     else:
-        return jsonify({"message": "User logged in"}, 200)
+        return jsonify({"screen_name": session["screen_name"]}, 200)
 
 @app.route('/authenticate')
 def authenticate():
@@ -121,7 +121,7 @@ def authenticate():
 
     oauth_store[oauth_token] = oauth_token_secret
 
-    return jsonify({"link": f"{authorize_url}?oauth_token={oauth_token}"}), 200
+    return jsonify({"link": f"{authorize_url}?oauth_token={oauth_token}"}, 200)
 
 @app.route('/callback')
 def callback():
@@ -178,22 +178,22 @@ def generate_game():
     end_time = data.get('end_time') # end_time can be optionally none
     
     # Default users
-    default_users = ["elonmusk", "VancityReynolds", "KDTrey5", "NICKIMINAJ", "BarackObama", "neiltyson", "mcuban", "BernieSanders", "lexfridman", "MrBeast", "KingJames", "stephenasmith"]
+    default_users = ["ChipotleTweets", "chrissyteigen", "elonmusk", "VancityReynolds", "NICKIMINAJ", "BarackObama", "neiltyson", "mcuban", "BernieSanders", "lexfridman", "MrBeast", "KingJames"]
 
     # Generate random users
-    rand_user1 = user[random.randint(0, 11)]
+    rand_user1 = default_users[random.randint(0, 11)]
 
-    rand_user2 = user[random.randint(0, 11)]
+    rand_user2 = default_users[random.randint(0, 11)]
     while rand_user2 == rand_user1:
-        rand_user2 = user[random.randint(0, 11)]
+        rand_user2 = default_users[random.randint(0, 11)]
 
-    rand_user3 = user[random.randint(0, 11)]
+    rand_user3 = default_users[random.randint(0, 11)]
     while rand_user3 == rand_user2 or rand_user3 == rand_user1:
-        rand_user3 = user[random.randint(0, 11)]
+        rand_user3 = default_users[random.randint(0, 11)]
 
-    rand_user4 = user[random.randint(0, 11)]
+    rand_user4 = default_users[random.randint(0, 11)]
     while rand_user4 == rand_user3 or rand_user4 == rand_user2 or rand_user4 == rand_user1:
-        rand_user4 = user[random.randint(0, 11)]
+        rand_user4 = default_users[random.randint(0, 11)]
 
     users = [rand_user1, rand_user2, rand_user3, rand_user4]
 
@@ -206,7 +206,7 @@ def generate_game():
 
     # if not end_time:
     start_datetime = datetime.strptime(start_time, datetime_format)
-    end_datetime = start_datetime + timedelta(weeks=26) ## Hardcoded, change this
+    end_datetime = start_datetime + timedelta(weeks=15) ## Hardcoded, change this
     end_time = end_datetime.strftime(datetime_format)
 
     results["profile_images"] = {}
@@ -347,18 +347,22 @@ def interact_tweet():
 # Not used
 @app.route("/generate_higherlower", methods=["POST"])
 def generate_higherlower():
-    usernames = ["elonmusk", "BarackObama", "BernieSanders", "KDTrey5", "mcuban", "lexfridman", "MrBeast", "KingJames", "stephenasmith"]
+    usernames = ["elonmusk", "BarackObama", "BernieSanders", "mcuban", "lexfridman", "MrBeast", "KingJames"]
     
     # Get top 8 tweets within the year for a particular celebrity
     time_now = datetime.now()
-    time_earlier = time_now - timedelta(weeks=26)
+    time_earlier = time_now - timedelta(weeks=13)
     start_time = time_earlier.strftime(datetime_format)
     end_time = time_now.strftime(datetime_format)
 
     results = {}
 
-    rand_user = usernames[random.randint(0, 4)]
+    rand_user = usernames[random.randint(0, 6)]
     results[rand_user] = getTopTweets(rand_user, start_time, end_time, 8)
+
+    client = get_client()
+    user_info = client.get_user(username=rand_user, user_fields=['profile_image_url'])
+    results["profile_image"] = user_info.data['profile_image_url']
     
     return jsonify(results), 200
     
