@@ -10,13 +10,13 @@ import getHint from "../../api/getHint.js";
 export default function Main() {
   const [mistakesRemaining, setMistakesRemaining] = useState(4);
   const [selectedTiles, setSelectedTiles] = useState([]);
-  const [tweets, setTweets] = useState([]);
   const [correctTiles, setCorrectTiles] = useState([]);
   const [incorrectTiles, setIncorrectTiles] = useState([]);
   const [done, setDone] = useState(false);
   const [oneAway, setOneAway] = useState(false);
   const [start, setStart] = useState(true);
   const [hint, setHint] = useState("");
+  const [fullArr, setFullArr] = useState({});
 
   function shuffle(array) {
     const shuffledArray = [...array];
@@ -44,6 +44,16 @@ export default function Main() {
   function deselectAll() {
     return setSelectedTiles([]);
   }
+
+  useEffect(() => {
+    let timer;
+    if (oneAway) {
+      timer = setTimeout(() => {
+        setOneAway(false);
+      }, 5000); // 20 seconds
+    }
+    return () => clearTimeout(timer);
+  }, [oneAway]);
 
   const selectTweetTile = (id) => {
     setSelectedTiles((prev) => {
@@ -74,13 +84,16 @@ export default function Main() {
     const allStillWrong = incorrectTiles.filter(
       (tweet) => !corr.map((t) => t.id).includes(tweet.id)
     );
-    console.log(allStillWrong)
+    console.log(allStillWrong);
     if (allStillWrong.length == 0) {
-        console.log("hi")
-        setDone(true)
+      console.log("hi");
+      setDone(true);
     }
     setIncorrectTiles(allStillWrong);
     setSelectedTiles([]);
+    if (allStillWrong.length < 4) {
+      setDone(true);
+    }
   }
 
   function submitGuesses() {
@@ -95,39 +108,22 @@ export default function Main() {
       } else {
         users.sort();
         let countArr = 0;
-        for (let i = 0; i < users.length-1; i++) {
-            if (users[i] === users[i+1]) {
-                countArr = countArr + 1;
-                }
-            }
-            if (countArr === 2) {
-                setOneAway(true);
-            }
+        for (let i = 0; i < users.length - 1; i++) {
+          if (users[i] === users[i + 1]) {
+            countArr = countArr + 1;
+          }
+        }
+        if (countArr === 2) {
+          setOneAway(true);
+        }
         setMistakesRemaining(mistakesRemaining - 1);
         if (mistakesRemaining === 1) {
-            setDone(true);
+          setDone(true);
+        }
       }
+      return false;
     }
-    return false;
   }
-}
-
-  const CustomizeButton = ({ width }) => {
-    return (
-      <button
-        className={`mt-5 flex flex-row items-center bg-black bg-opacity-10 p-2 rounded-[4px] mb-[6px] border border-white border-opacity-10 hover:bg-opacity-[.15] `}
-        onClick={() => {
-          setGlobalState("showAddPeople", true);
-          setGlobalState("showSideBar", false);
-        }}
-      >
-        <FaUserFriends className="text-lg w-[24px] text-[#7289da] mr-2" />
-        <span className="whitespace-nowrap overflow-hidden">
-          <span className="text-black font-semibold">Customize</span>
-        </span>
-      </button>
-    );
-  };
 
   return (
     <div className="max-w-[100rem] ml-auto mr-auto flex flex-col items-center">
@@ -139,6 +135,7 @@ export default function Main() {
                 setStart={setStart}
                 setIncorrectTiles={setIncorrectTiles}
                 shuffle={shuffle}
+                setFullArr={setFullArr}
               ></StartPage>
             </>
           ) : (
@@ -211,7 +208,7 @@ export default function Main() {
               <div className="flex gap-2 place-content-center">
                 <Button
                   className={
-                    "active:bg-blue-300 border border-opacity-100 px-6 py-2 rounded-full border-black"
+                    "hover:bg-gray-200 duration-200 border border-opacity-100 px-6 py-2 rounded-full border-black"
                   }
                   onClick={shuffleBoard}
                 >
@@ -219,7 +216,7 @@ export default function Main() {
                 </Button>
                 <Button
                   className={
-                    "active:bg-blue-300 border border-opacity-100 px-6 py-2 rounded-full border-black"
+                    "hover:bg-gray-200 duration-200 border border-opacity-100 px-6 py-2 rounded-full border-black"
                   }
                   onClick={deselectAll}
                 >
@@ -227,7 +224,7 @@ export default function Main() {
                 </Button>
                 <Button
                   className={
-                    "active:bg-blue-500 border border-opacity-100 px-6 py-2 rounded-full border-black"
+                    "hover:bg-gray-200 duration-200 border border-opacity-100 px-6 py-2 rounded-full border-black"
                   }
                   onClick={submitGuesses}
                 >
@@ -235,7 +232,7 @@ export default function Main() {
                 </Button>
                 <Button
                   className={
-                    "active:bg-blue-500 border border-opacity-100 px-6 py-2 rounded-full border-black"
+                    "hover:bg-gray-200 duration-200 border border-opacity-100 px-6 py-2 rounded-full border-black"
                   }
                   onClick={handleHint}
                 >
@@ -247,7 +244,7 @@ export default function Main() {
         </>
       ) : (
         <>
-          <DoneScreen></DoneScreen>
+          <DoneScreen tweetsByUser={fullArr} />
         </>
       )}
     </div>

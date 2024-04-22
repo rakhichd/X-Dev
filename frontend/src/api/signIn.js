@@ -1,6 +1,6 @@
 const signIn = async () => {
   const result = await fetch(
-    "https://6b7f-8-25-197-34.ngrok-free.app/authenticate",
+    "https://444e-8-25-197-34.ngrok-free.app/authenticate",
     {
       method: "GET",
       headers: {

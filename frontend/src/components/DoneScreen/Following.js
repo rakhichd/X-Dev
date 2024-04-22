@@ -13,6 +13,5 @@ export default function Following() {
         >
             {follow ? 'Following' : 'Follow'}
         </Button>
-
     )
 }

@@ -65,7 +65,7 @@ export default function AddPeople() {
       <div className="absolute inset-0 bg-black opacity-50"></div>
       <div className="relative z-[1000] bg-white rounded-md p-8 shadow-lg w-[500px]">
         <CloseModal />
-        <div className="flex items-center mb-2">
+        <div className="flex items-center mb-5">
           <h1 className="text-left flex-grow text-2xl">Add People</h1>
         </div>
         <TextInput
@@ -107,7 +107,7 @@ export default function AddPeople() {
           </div>
         </div>
         <Button
-          className="bg-black hover:opacity-80 duration-200 px-5 py-2 mt-3 rounded-md text-white"
+          className="bg-black hover:opacity-80 duration-200 px-5 py-2 mt-5 w-full rounded-md text-white"
           onClick={handleDone}
         >
           Done

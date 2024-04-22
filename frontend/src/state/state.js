@@ -4,7 +4,7 @@ const { setGlobalState, useGlobalState, getGlobalState } = createGlobalState({
   showSideBar: false,
   showAddPeople: false,
   people: [],
-  startDate: "",
+  startDate: "2023",
   tweets: {}
 });
 

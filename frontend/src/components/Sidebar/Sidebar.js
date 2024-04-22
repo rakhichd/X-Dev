@@ -12,7 +12,7 @@ import { FaLink } from "react-icons/fa6";
 const HigherLowerButton = ({ width, onClick }) => {
   return (
     <button
-      className={`flex flex-row w-full items-center bg-white bg-opacity-10 p-2 rounded-[4px] mb-[6px] border border-white border-opacity-10 hover:bg-opacity-[.15] `}
+      className={`mb-[16px] flex flex-row w-full items-center bg-white bg-opacity-10 p-2 rounded-[4px] mb-[6px] border border-white border-opacity-10 hover:bg-opacity-[.15] `}
       onClick={onClick}
     >
       <RiArrowUpDownLine className="text-lg w-[24px] text-[#7289da] mr-2" />
@@ -62,7 +62,7 @@ const SideBar = () => {
         {showSideBar && (
           <>
             <div className="px-3 w-full h-full">
-              <div className="text-gray-400 text-[16px] w-full">
+              <div className="text-gray-400 text-[16px] w-full mb-20">
                 <CloseButton setShowSideBar={setShowSideBar} />
               </div>
               <div
